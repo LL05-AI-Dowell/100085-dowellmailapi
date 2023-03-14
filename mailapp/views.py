@@ -1,0 +1,97 @@
+from django.shortcuts import render
+
+# Create your views here.
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+import sib_api_v3_sdk
+from sib_api_v3_sdk.rest import ApiException
+import json
+from database.dowellconnection import dowellconnection
+from database.dowelleventcreation import get_event_id
+from database.database_management import *
+from mailapp.sendinblue import getTemplate as gt
+
+
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class mailSetting(APIView):
+    def post(self, request ):
+        key = request.data.get('key')
+        fromAddress = request.data.get('fromAddress')
+        fromName = request.data.get('fromName')
+        templateName = request.data.get('templateName')
+        subject = request.data.get('subject')
+        topic = request.data.get('topic')
+        print("---Got the key from the database---")
+        get_data = gt.getTemplate(key)
+        print("---Template fetching from sedinblue database---")
+        data = json.loads(get_data)
+        data_temp = []
+        for i in data['templates']:
+            name = i['name']
+            htmlContent = i['htmlContent']
+            temp_dist= {"name":name,"htmlContent":htmlContent}
+            data_temp.append(temp_dist)
+        result = [obj for obj in data_temp if obj['name'] == templateName]
+        print("---Found the template based on topic/tempate name---")
+        field = {
+            "eventId": get_event_id()['event_id'],
+            "key" : key,
+            "fromAddress" : fromAddress,
+            "fromName" : fromName,
+            "templateName" : templateName,
+            "subject" : subject,
+            "topic" : topic,
+            "template_data": result
+        }
+        response = dowellconnection(*Email_management,"insert",field)
+        print("---Date inserting Now---",response)
+        if response:
+        # return Response(result,status=status.HTTP_201_CREATED)
+            return Response({"INFO":"Setting has been inserted!!"},status=status.HTTP_201_CREATED)
+        else:
+            return Response({"INFO":"Something went wrong!!"},status=status.HTTP_400_BAD_REQUEST)
+        
+@method_decorator(csrf_exempt, name='dispatch')
+class SendEmail(APIView):
+    def post(self, request):
+        topic = request.data.get('topic')
+        toemail = request.data.get('toEmail')
+        toname = request.data.get('toName')
+        print("---Got the required parameter to send mail---",topic,toemail,toname)
+        field = {
+            "topic":topic
+        }
+        fetched_data = dowellconnection(*Email_management,"find",field)
+        print("---Fetching data from our database based on topic---")
+        data = json.loads(fetched_data)
+        sender = data['data']['fromName']
+        fromemail = data['data']['fromAddress']
+        subject = data['data']['subject']
+        key = data['data']['key']
+        message = data['data']['template_data'][0]['htmlContent']
+        print("---Got the template the htmlContent---")
+        configuration = sib_api_v3_sdk.Configuration()
+        configuration.api_key['api-key'] = key
+        api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
+        subject = subject
+        html_content = message
+        sender = {"name": sender, "email": fromemail}
+        to = [{"email": toemail, "name": toname}]
+        headers = {"Some-Custom-Name": "unique-id-1234"}
+        print("---All the data are gethered and ready to send mail---")
+        send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(to=to, headers=headers,html_content=html_content, sender=sender, subject=subject)
+        try:
+            api_response = api_instance.send_transac_email(send_smtp_email)
+            api_response_dict = api_response.to_dict()
+            print("---The mail has been sent ! Happy :D---")
+            return Response({"INFO":"Mail has been sent!!","INFO":json.dumps(api_response_dict)},status=status.HTTP_200_OK)
+        except ApiException as e:
+            return Response({"error":"Exception when calling SMTPApi->send_transac_email: %s\n" % e},status=status.HTTP_400_BAD_REQUEST)
+        
+    
+
