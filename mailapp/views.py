@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 import sib_api_v3_sdk
 from sib_api_v3_sdk.rest import ApiException
 import json
-from database.dowellconnection import dowellconnection
+from database.dowellconnection import dowellconnection , dowellconnectionupdate
 from database.dowelleventcreation import get_event_id
 from database.database_management import *
 from mailapp.sendinblue import getTemplate as gt
@@ -48,10 +48,11 @@ class mailSetting(APIView):
             "topic" : topic,
             "template_data": result
         }
+        print("---Data inserting Now---",response)
         response = dowellconnection(*Email_management,"insert",field)
-        print("---Date inserting Now---",response)
         if response:
         # return Response(result,status=status.HTTP_201_CREATED)
+            print("---Data has been inserted---")
             return Response({"INFO":"Setting has been inserted!!"},status=status.HTTP_201_CREATED)
         else:
             return Response({"INFO":"Something went wrong!!"},status=status.HTTP_400_BAD_REQUEST)
@@ -93,5 +94,57 @@ class SendEmail(APIView):
         except ApiException as e:
             return Response({"error":"Exception when calling SMTPApi->send_transac_email: %s\n" % e},status=status.HTTP_400_BAD_REQUEST)
         
-    
+@method_decorator(csrf_exempt,name ='dispatch')
+class subscriberList(APIView):
+    def post(self, request):
+        topic = request.data.get("topic")
+        subscriberEmail = request.data.get("subscriberEmail")
+        subscriberStatus = request.data.get("subscriberStatus", True)
+        typeOfSubscriber = request.data.get("typeOfSubscriber")
+        print("---Checking the requests are ok---")
+        if not (topic and subscriberEmail and subscriberStatus and typeOfSubscriber):
+            print("---Some parameter is missing---")
+            missing_values = [key for key, value in request.data.items() if not value]
+            return Response({"INFO":f"{', '.join(missing_values)} are missing!"}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            print("---All parameters are ok and ready to insert to our database---")
+            field = {
+                "eventId": get_event_id()['event_id'],
+                "topic":topic,
+                "subscriberEmail":subscriberEmail,
+                "subscriberStatus":subscriberStatus,
+                "typeOfSubscriber":typeOfSubscriber
+            }
+            print("---Data inserting now---")
+            inserted_data = dowellconnection(*subscriber_management,"insert",field)
+            if inserted_data:
+                print("---Data has been inserted---")
+                return Response({"INFO": f"{typeOfSubscriber} has subscribed","DATABASE_INFO":json.loads(inserted_data)}, status=status.HTTP_200_OK)
+            else:
+                return Response({"INFO":"Something went wrong!"}, status=status.HTTP_400_BAD_REQUEST)
 
+
+    def put(self,request):
+        topic = request.data.get("topic")
+        subscriberEmail = request.data.get("subscriberEmail")
+        field = {
+            "topic":topic,
+            "subscriberEmail":subscriberEmail
+        }
+        print("---Fetching data from database based on required data---")
+        fetched_data = dowellconnection(*subscriber_management,"find",field)
+        data = json.loads(fetched_data)
+        print("---Data has been found and checking if the provided email has subscribed to the topic of not ---")
+        if (data['data']['subscriberStatus'] == True):
+            field= {
+                "_id":data['data']['_id']
+            }
+            update_field = {
+                "subscriberStatus": False
+            }
+            print("---Provided email was subscribed to the topic and Unsubscribing---")
+            update_response = dowellconnectionupdate(*subscriber_management,"update",field,update_field)
+            print("---Unsubscribed ! SAD---")
+            return Response({"INFO":"User has unsubscribed" , "DATABASE_INFO":json.loads(update_response)},status=status.HTTP_202_ACCEPTED)
+        else:
+            return Response({"INFO":"Already an unsubscribed!"},status=status.HTTP_406_NOT_ACCEPTABLE)
