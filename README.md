@@ -15,7 +15,7 @@ This backend service serves as the DowellMail applications.
 | POST | /api/ mail-setting/ | To set the required details to send email|
 | POST | /api/ send-mail/| To send mail using dowell mail API  |
 | POST|/api/subscribe-newsletter/| To subscribe to newsletter|
-|GET|/api/subscribe-newsletter/| To unsubscribe to newsletter|
+|PUT|/api/subscribe-newsletter/| To unsubscribe to newsletter|
 
 ### Endpoints Definition(Request - Response)
 #### Server status
