@@ -16,6 +16,7 @@ This backend service serves as the DowellMail applications.
 | POST | /api/ send-mail/| To send mail using dowell mail API  |
 | POST|/api/subscribe-newsletter/| To subscribe to newsletter|
 |PUT|/api/subscribe-newsletter/| To unsubscribe to newsletter|
+|POST|/api/signUp-otp-verification/|To send verification OTP|
 
 ### Endpoints Definition(Request - Response)
 #### Server status
@@ -121,6 +122,31 @@ Response-400
         "INFO":"Already an unsubscribed!"
     }
     ```
+#### Send Verification OTP in mail
+_POST_ to `/api/signUp-otp-verification/`
+
+Request Body
+```json
+{
+    "toEmail":"<Reciever Email>",
+    "toName":"<Reciever Name>",
+    "topic":"OTPVerification",
+    "otp":"<OTP>"
+}
+```
+Response-200
+```json
+{
+    "INFO":"Mail has been sent!!",
+    "INFO":"Response from the SendinBlue API"
+}
+```
+Response-400
+```json
+{
+    "error":"Exception when calling SMTPApi->send_transac_email"
+}
+```
 ### Technologies Used
 
 - Python is a programming language that lets you work more quickly and integrate your systems more effectively.

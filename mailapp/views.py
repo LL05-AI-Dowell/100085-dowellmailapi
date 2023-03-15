@@ -48,7 +48,7 @@ class mailSetting(APIView):
             "topic" : topic,
             "template_data": result
         }
-        print("---Data inserting Now---",response)
+        print("---Data inserting Now---")
         response = dowellconnection(*Email_management,"insert",field)
         if response:
         # return Response(result,status=status.HTTP_201_CREATED)
@@ -148,3 +148,42 @@ class subscriberList(APIView):
             return Response({"INFO":"User has unsubscribed" , "DATABASE_INFO":json.loads(update_response)},status=status.HTTP_202_ACCEPTED)
         else:
             return Response({"INFO":"Already an unsubscribed!"},status=status.HTTP_406_NOT_ACCEPTABLE)
+        
+
+@method_decorator(csrf_exempt,name ='dispatch')
+class signUpOTPverification(APIView):
+    def post(self, request):
+        topic = request.data.get('topic')
+        toemail = request.data.get('toEmail')
+        toname = request.data.get('toName')
+        otp = request.data.get('otp')
+        print("---Got the required parameter to send mail---",topic,toemail,toname)
+        field = {
+            "topic":topic
+        }
+        fetched_data = dowellconnection(*Email_management,"find",field)
+        data = json.loads(fetched_data)
+        sender = data['data']['fromName']
+        fromemail = data['data']['fromAddress']
+        subject = data['data']['subject']
+        key = data['data']['key']
+        message = data['data']['template_data'][0]['htmlContent']
+        print("---Got the template the htmlContent---")
+        emailBody = message.format(toname,otp)
+        configuration = sib_api_v3_sdk.Configuration()
+        configuration.api_key['api-key'] = key
+        api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
+        subject = subject
+        html_content = emailBody
+        sender = {"name": sender, "email": fromemail}
+        to = [{"email": toemail, "name": toname}]
+        headers = {"Some-Custom-Name": "unique-id-1234"}
+        print("---All the data are gethered and ready to send mail---")
+        send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(to=to, headers=headers,html_content=html_content, sender=sender, subject=subject)
+        try:
+            api_response = api_instance.send_transac_email(send_smtp_email)
+            api_response_dict = api_response.to_dict()
+            print("---The mail has been sent ! Happy :D---")
+            return Response({"INFO":"Mail has been sent!!","INFO":json.dumps(api_response_dict)},status=status.HTTP_200_OK)
+        except ApiException as e:
+            return Response({"error":"Exception when calling SMTPApi->send_transac_email: %s\n" % e},status=status.HTTP_400_BAD_REQUEST)
