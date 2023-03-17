@@ -9,3 +9,4 @@ from django.views.decorators.csrf import csrf_exempt
 class serverReports(APIView):
     def get(self, request ):
         return Response({"Dowell Mail Service is running..."},status=status.HTTP_200_OK)
+    

@@ -6,4 +6,5 @@ urlpatterns = [
     path('mail-setting/',mailSetting.as_view()),
     path('subscribe-newsletter/',subscriberList.as_view()),
     path('signUp-otp-verification/',signUpOTPverification.as_view()),
+    path('feedback-survey/',feedbackSurvey.as_view()),
 ]
