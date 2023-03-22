@@ -158,7 +158,7 @@ class signUpOTPverification(APIView):
         toemail = request.data.get('toEmail')
         toname = request.data.get('toName')
         otp = request.data.get('otp')
-        print("---Got the required parameter to send mail---",topic,toemail,toname)
+        print("---Got the required parameter to send mail---",topic,toemail,toname,otp)
         field = {
             "topic":topic
         }
