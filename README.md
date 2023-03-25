@@ -8,6 +8,7 @@ This backend service serves as the DowellMail applications.
 - Unsubscribe to newsletter
 - Signup otp verification
 - feedback survey mail
+- Signup feedback mail
 ### API Endpoints 
 - Base URL : `https://100085.pythonanywhere.com/`
 
@@ -20,7 +21,7 @@ This backend service serves as the DowellMail applications.
 |PUT|/api/subscribe-newsletter/| To unsubscribe to newsletter|
 |POST|/api/signUp-otp-verification/|To send verification OTP|
 |POST|/api/feedback-survey/|To send feedback-survey|
-
+|POST|/api/signup-feedback/|To send sign up feedback mail|
 ### Endpoints Definition(Request - Response)
 #### Server status
 [Click here to check server status](https://100085.pythonanywhere.com/)
@@ -163,6 +164,38 @@ Request Body
     "data_survey_id":"<data_survey_id>",
     "survey_title": "<survey_title>",
     "user_name": "<user_name>"
+}
+
+```
+Response-200
+```json
+{
+    "INFO":"Mail has been sent!!",
+    "INFO":"Response from the SendinBlue API"
+}
+```
+Response-400
+```json
+{
+    "error":"Exception when calling SMTPApi->send_transac_email"
+}
+```
+#### Signup feedback email
+_POST_ to `/api/signup-feedback/`
+
+Request Body
+```json
+{   
+
+    "topic" : "Signupfeedback",
+    "toEmail":"<Reciever Email>",
+    "toName":"<Reciever Name>",
+    "firstname" : "<Firstname>",
+    "lastname" : "<lastname>",
+    "username" : "<username>",
+    "phoneCode" : "<code>",
+    "phoneNumber" : "<Phone number>"
+
 }
 
 ```
