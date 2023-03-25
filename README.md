@@ -212,6 +212,38 @@ Response-400
     "error":"Exception when calling SMTPApi->send_transac_email"
 }
 ```
+#### Send Newsletters 
+_POST_ to `/api/send-newsletter/`
+
+Request Body
+```json
+{
+    "toEmail": [
+        {
+            "email": "jimmy98@example.com",
+            "name": "Jimmy"
+        },
+        {
+            "email": "jimmy98@example.com",
+            "name": "Jimmy"
+        }
+    ],
+    "topic":"<topic name you have register>"
+}
+```
+Response-200
+```json
+{
+    "INFO":"Mail has been sent!!",
+    "INFO":"Response from the SendinBlue API"
+}
+```
+Response-400
+```json
+{
+    "error":"Exception when calling SMTPApi->send_transac_email"
+}
+```
 ### Technologies Used
 
 - Python is a programming language that lets you work more quickly and integrate your systems more effectively.

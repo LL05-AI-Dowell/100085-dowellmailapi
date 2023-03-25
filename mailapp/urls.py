@@ -8,4 +8,5 @@ urlpatterns = [
     path('signUp-otp-verification/',signUpOTPverification.as_view()),
     path('feedback-survey/',feedbackSurvey.as_view()),
     path('signup-feedback/',signupfeedbackmail.as_view()),
+    path('send-newsletter/',sendNewsLetter.as_view()),
 ]
