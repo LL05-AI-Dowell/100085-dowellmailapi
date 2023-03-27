@@ -15,7 +15,7 @@ subscriber_management = [
     "ABCDE",
 ]
 
-dowellSMSsettings = [
+dowellSMS = [
     "maildowell",
     "maildowell",
     "dowellSMS",
@@ -24,7 +24,7 @@ dowellSMSsettings = [
     "ABCDE",
 ]
 
-dowellSMS = [
+dowellSMSsettings = [
     "maildowell",
     "maildowell",
     "dowellSMSsetting",
