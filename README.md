@@ -9,6 +9,7 @@ This backend service serves as the DowellMail applications.
 - Signup otp verification
 - feedback survey mail
 - Signup feedback mail
+- Send SMS
 ### API Endpoints 
 - Base URL : `https://100085.pythonanywhere.com/`
 
@@ -22,6 +23,7 @@ This backend service serves as the DowellMail applications.
 |POST|/api/signUp-otp-verification/|To send verification OTP|
 |POST|/api/feedback-survey/|To send feedback-survey|
 |POST|/api/signup-feedback/|To send sign up feedback mail|
+|POST|/api/sms/|To send sms|
 ### Endpoints Definition(Request - Response)
 #### Server status
 [Click here to check server status](https://100085.pythonanywhere.com/)
@@ -235,6 +237,31 @@ Response-200
 ```json
 {
     "INFO":"Mail has been sent!!",
+    "INFO":"Response from the SendinBlue API"
+}
+```
+Response-400
+```json
+{
+    "error":"Exception when calling SMTPApi->send_transac_email"
+}
+```
+#### Send SMS
+_POST_ to `/api/sms/`
+
+Request Body
+```json
+{
+    "sender" : "<sender>",
+    "recipient" : "<mobile number with country code>",
+    "content" : "<Message>",
+    "created_by" : "Manish"
+}
+```
+Response-200
+```json
+{
+    "INFO":"SMS has been sent!!",
     "INFO":"Response from the SendinBlue API"
 }
 ```

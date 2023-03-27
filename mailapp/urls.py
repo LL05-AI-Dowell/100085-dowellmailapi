@@ -9,4 +9,6 @@ urlpatterns = [
     path('feedback-survey/',feedbackSurvey.as_view()),
     path('signup-feedback/',signupfeedbackmail.as_view()),
     path('send-newsletter/',sendNewsLetter.as_view()),
+    path('sms-setting/',dowellSMSsetting.as_view()),
+    path('sms/',dowellSMS.as_view()),
 ]

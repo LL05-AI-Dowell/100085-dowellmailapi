@@ -14,3 +14,21 @@ subscriber_management = [
     "100085003",
     "ABCDE",
 ]
+
+dowellSMSsettings = [
+    "maildowell",
+    "maildowell",
+    "dowellSMS",
+    "dowellSMS",
+    "100085004",
+    "ABCDE",
+]
+
+dowellSMS = [
+    "maildowell",
+    "maildowell",
+    "dowellSMSsetting",
+    "dowellSMSsetting",
+    "100085005",
+    "ABCDE",
+    ]

@@ -318,5 +318,52 @@ class sendNewsLetter(APIView):
             return Response({"MAIL INFO":"Mail has been sent!!","INFO":json.dumps(api_response_dict)},status=status.HTTP_200_OK)
         except ApiException as e:
             return Response({"error":"Exception when calling SMTPApi->send_transac_email: %s\n" % e},status=status.HTTP_400_BAD_REQUEST)
-        
-        return Response({"message": toemail})
+    
+
+@method_decorator(csrf_exempt, name='dispatch')
+class dowellSMSsetting(APIView):
+    def post(self, request ):
+        key = request.data.get('key')
+        created_by = request.data.get('created_by')
+        print("---Got the key from the database---")
+        field = {
+            "eventId": get_event_id()['event_id'],
+            "key" : key,
+            "created_by" : created_by
+        }
+        print("---Data inserting Now---")
+        response = dowellconnection(*dowellSMSsettings,"insert",field)
+        print("---Data has been inserted---")
+        if response:
+            return Response({"INFO":"Setting has been inserted!!"},status=status.HTTP_201_CREATED)
+        else:
+            return Response({"INFO":"Something went wrong!!"},status=status.HTTP_400_BAD_REQUEST)
+
+@method_decorator(csrf_exempt, name='dispatch')
+class dowellSMS(APIView):
+    def post(self, request ):
+        sender = request.data.get('sender')
+        recipient = request.data.get('recipient')
+        content = request.data.get('content')
+        created_by = request.data.get('created_by')
+        print("---Got the key from the database---")
+        field = {
+            "created_by" : created_by
+        }
+        print("---Data fetching Now---")
+        fetched_data = dowellconnection(*dowellSMSsettings,"find",field)
+        data = json.loads(fetched_data)
+        key = data["data"]["key"]
+        configuration = sib_api_v3_sdk.Configuration()
+        configuration.api_key['api-key'] = key
+
+        api_instance = sib_api_v3_sdk.TransactionalSMSApi(sib_api_v3_sdk.ApiClient(configuration))
+        send_transac_sms = sib_api_v3_sdk.SendTransacSms(sender=sender, recipient=recipient, content=content)
+
+        try:
+            api_response = api_instance.send_transac_sms(send_transac_sms)
+            api_response_dict = api_response.to_dict()
+            print("---The SMS has been sent ! Happy :D---")
+            return Response({"MAIL INFO":"SMS has been sent!!","INFO":json.dumps(api_response_dict)},status=status.HTTP_200_OK)
+        except ApiException as e:
+            return Response({"error":"Exception when calling SMTPApi->send_transac_email: %s\n" % e},status=status.HTTP_400_BAD_REQUEST)
