@@ -248,7 +248,9 @@ class signupfeedbackmail(APIView):
         username = request.data.get('username')
         phoneCode = request.data.get('phoneCode')
         phoneNumber = request.data.get('phoneNumber')
-        print("---Got the required parameter to send mail---",topic,toemail,toname,firstname,lastname,username,phoneCode,phoneNumber)
+        usertype = request.data.get('usertype')
+        country = request.data.get('country')
+        print("---Got the required parameter to send mail---",topic,toemail,toname,firstname,lastname,username,phoneCode,phoneNumber,usertype,country)
         field = {
             "topic":topic
         }
@@ -262,7 +264,10 @@ class signupfeedbackmail(APIView):
         message = data['data']['template_data'][0]['htmlContent']
         htmlTemplateContent = gTH.getTemplateHTMLContent(key,templateName)[0]['htmlContent']
         print("---Got the template the htmlContent---")
-        emailBody = htmlTemplateContent.format(firstname,lastname,firstname,lastname,username,phoneCode,phoneNumber,toemail)
+        phone = phoneCode + phoneNumber 
+        print("---Got the phone----",phone)
+        emailBody = htmlTemplateContent.format(firstname,firstname,lastname,username,phone,toemail,usertype,country)
+        print("---sets all the fields---")
         configuration = sib_api_v3_sdk.Configuration()
         configuration.api_key['api-key'] = key
         api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
@@ -367,3 +372,5 @@ class dowellSMS(APIView):
             return Response({"MAIL INFO":"SMS has been sent!!","INFO":json.dumps(api_response_dict)},status=status.HTTP_200_OK)
         except ApiException as e:
             return Response({"error":"Exception when calling SMTPApi->send_transac_email: %s\n" % e},status=status.HTTP_400_BAD_REQUEST)
+
+

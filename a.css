@@ -1,0 +1,87 @@
+@import url(https://fonts.googleapis.com/css?family=Open+Sans);
+
+body {
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    font-family: 'Open Sans',serif;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 40em;
+    width: 30em;
+    padding: 1em;
+    gap:1em;
+}
+
+.logo-section {
+    height: 15%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.content-section {
+    height: 65%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 0.1;
+}
+
+.social-media-section {
+    height: 20%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: black;
+    color: aliceblue;
+}
+
+.dowell-logo {
+    width: 20%;
+}
+
+.account-tick {
+    width: 10%;
+}
+.user-details {
+    line-height: 1.2;
+}
+
+ul {
+    list-style: none;
+    font-weight: bold;
+}
+.btn {
+    display: flex;
+    align-items: center;
+    background-color: #CCA250;
+    padding: 0.5em;
+    margin: 1em;
+    border-radius: 1em;
+}
+
+.icon {
+    width: 2em;
+    filter: invert(100%)
+}
+
+a {
+    text-decoration: none;
+}
+
+p {
+    font-weight: bold ;
+}
