@@ -196,7 +196,9 @@ Request Body
     "lastname" : "<lastname>",
     "username" : "<username>",
     "phoneCode" : "<code>",
-    "phoneNumber" : "<Phone number>"
+    "phoneNumber" : "<Phone number>",
+    "usertype" : "<usertype>",
+    "country" : "<country>"
 
 }
 
