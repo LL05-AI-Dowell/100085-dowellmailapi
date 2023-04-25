@@ -14,7 +14,7 @@ from database.dowelleventcreation import get_event_id
 from database.database_management import *
 from mailapp.sendinblue import getTemplate as gt
 from mailapp.sendinblue import getHTMLContent as gTH
-
+import os
 
 
 
@@ -275,9 +275,10 @@ class signupfeedbackmail(APIView):
         html_content = emailBody
         sender = {"name": sender, "email": fromemail}
         to = [{"email": toemail, "name": toname}]
+        bcc = [{"email": "customersupport@dowellresearch.sg" , "name":"customer support"},{"email": "nitesh@dowellresearch.in" , "name":"Nitesh"}]
         headers = {"Some-Custom-Name": "unique-id-1234"}
         print("---All the data are gethered and ready to send mail---")
-        send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(to=to, headers=headers,html_content=html_content, sender=sender, subject=subject)
+        send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(to=to,bcc=bcc, headers=headers,html_content=html_content, sender=sender, subject=subject)
         try:
             api_response = api_instance.send_transac_email(send_smtp_email)
             api_response_dict = api_response.to_dict()
@@ -358,6 +359,7 @@ class dowellSMS(APIView):
         print("---Data fetching Now---")
         fetched_data = dowellconnection(*dowellSMSsettings,"find",field)
         data = json.loads(fetched_data)
+        print("---Data fetched---")
         key = data["data"]["key"]
         configuration = sib_api_v3_sdk.Configuration()
         configuration.api_key['api-key'] = key
