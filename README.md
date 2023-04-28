@@ -10,6 +10,7 @@ This backend service serves as the DowellMail applications.
 - feedback survey mail
 - Signup feedback mail
 - Send SMS
+- Send Editor email
 ### API Endpoints 
 - Base URL : `https://100085.pythonanywhere.com/`
 
@@ -24,6 +25,7 @@ This backend service serves as the DowellMail applications.
 |POST|/api/feedback-survey/|To send feedback-survey|
 |POST|/api/signup-feedback/|To send sign up feedback mail|
 |POST|/api/sms/|To send sms|
+|POST|/api/editor-component/| To send mail from editor|
 ### Endpoints Definition(Request - Response)
 #### Server status
 [Click here to check server status](https://100085.pythonanywhere.com/)
@@ -264,6 +266,33 @@ Response-200
 ```json
 {
     "INFO":"SMS has been sent!!",
+    "INFO":"Response from the SendinBlue API"
+}
+```
+Response-400
+```json
+{
+    "error":"Exception when calling SMTPApi->send_transac_email"
+}
+```
+### Send Editor Mail
+_POST_ to `/api/editor-component/`
+Request Body
+```json
+{
+    "topic" : "EditorMailComponent",
+    "toEmail":"<Reciever Email>",
+    "toName":"<Reciever Name>",
+    "fromName":"<Sender name>",
+    "fromEmail" : "<Sender email>",
+    "subject" : "<subject>",
+    "email_body" : "<email body>"
+}
+```
+Response-200
+```json
+{
+    "INFO":"Mail has been sent!!",
     "INFO":"Response from the SendinBlue API"
 }
 ```

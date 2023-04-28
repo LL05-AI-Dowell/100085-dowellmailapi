@@ -11,4 +11,5 @@ urlpatterns = [
     path('send-newsletter/',sendNewsLetter.as_view()),
     path('sms-setting/',dowellSMSsetting.as_view()),
     path('sms/',dowellSMS.as_view()),
+    path('editor-component/',editormailcomponent.as_view()),
 ]
