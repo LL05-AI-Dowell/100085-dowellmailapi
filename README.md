@@ -277,6 +277,7 @@ Response-400
 ```
 #### Send Editor Mail
 _POST_ to `/api/editor-component/`
+
 Request Body
 ```json
 {
