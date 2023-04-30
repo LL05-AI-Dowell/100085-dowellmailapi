@@ -275,7 +275,7 @@ class signupfeedbackmail(APIView):
         html_content = emailBody
         sender = {"name": sender, "email": fromemail}
         to = [{"email": toemail, "name": toname}]
-        bcc = [{"email": "customersupport@dowellresearch.sg" , "name":"customer support"},{"email": "nitesh@dowellresearch.in" , "name":"Nitesh"}]
+        bcc = [{"email": "dowell@dowellresearch.uk" , "name":"Dowell Research"},{"email": "customersupport@dowellresearch.sg" , "name":"customer support"},{"email": "nitesh@dowellresearch.in" , "name":"Nitesh"}]
         headers = {"Some-Custom-Name": "unique-id-1234"}
         print("---All the data are gethered and ready to send mail---")
         send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(to=to,bcc=bcc, headers=headers,html_content=html_content, sender=sender, subject=subject)
