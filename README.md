@@ -275,8 +275,9 @@ Response-400
     "error":"Exception when calling SMTPApi->send_transac_email"
 }
 ```
-### Send Editor Mail
+#### Send Editor Mail
 _POST_ to `/api/editor-component/`
+
 Request Body
 ```json
 {
