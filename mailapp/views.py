@@ -15,7 +15,9 @@ from database.database_management import *
 from mailapp.sendinblue import getTemplate as gt
 from mailapp.sendinblue import getHTMLContent as gTH
 import os
+from dotenv import load_dotenv
 
+load_dotenv()
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -353,17 +355,18 @@ class dowellSMS(APIView):
         content = request.data.get('content')
         created_by = request.data.get('created_by')
         print("---Got the key from the database---")
-        field = {
-            "created_by" : created_by
-        }
-        print("---Data fetching Now---")
-        fetched_data = dowellconnection(*dowellSMSsettings,"find",field)
-        data = json.loads(fetched_data)
-        print("---Data fetched---")
-        key = data["data"]["key"]
+        # return Response(os.getenv("SECRET_KEY"))
+        # field = {
+        #     "created_by" : created_by
+        # }
+        # print("---Data fetching Now---")
+        # fetched_data = dowellconnection(*dowellSMSsettings,"find",field)
+        # data = json.loads(fetched_data)
+        # print("---Data fetched---")
+        # key = data["data"]["key"]
         configuration = sib_api_v3_sdk.Configuration()
-        configuration.api_key['api-key'] = key
-
+        # configuration.api_key['api-key'] = key
+        configuration.api_key['api-key'] = os.getenv("SECRET_KEY")
         api_instance = sib_api_v3_sdk.TransactionalSMSApi(sib_api_v3_sdk.ApiClient(configuration))
         send_transac_sms = sib_api_v3_sdk.SendTransacSms(sender=sender, recipient=recipient, content=content)
 
