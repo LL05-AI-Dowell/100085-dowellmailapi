@@ -401,14 +401,14 @@ class editormailcomponent(APIView):
         htmlTemplateContent = gTH.getTemplateHTMLContent(key,templateName)[0]['htmlContent']
         print("---Got the template the htmlContent---")
         emailBody = htmlTemplateContent.format(toname,email_body)
-        return Response({
-            "toemail" : toemail, 
-            "toname" : toname, 
-            "fromName" :fromName,
-            "fromemail": fromemail,
-            "subject" : subject,
-            "email_body" : emailBody,
-        },status=status.HTTP_200_OK)
+        # return Response({
+        #     "toemail" : toemail, 
+        #     "toname" : toname, 
+        #     "fromName" :fromName,
+        #     "fromemail": fromemail,
+        #     "subject" : subject,
+        #     "email_body" : emailBody,
+        # },status=status.HTTP_200_OK)
         configuration = sib_api_v3_sdk.Configuration()
         configuration.api_key['api-key'] = key
         api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
