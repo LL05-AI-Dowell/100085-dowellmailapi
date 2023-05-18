@@ -200,7 +200,9 @@ Request Body
     "phoneCode" : "<code>",
     "phoneNumber" : "<Phone number>",
     "usertype" : "<usertype>",
-    "country" : "<country>"
+    "country" : "<country>",
+    "verified_phone": "<message>",
+    "verified_email": "<message>",
 
 }
 

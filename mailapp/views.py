@@ -250,7 +250,9 @@ class signupfeedbackmail(APIView):
         phoneNumber = request.data.get('phoneNumber')
         usertype = request.data.get('usertype')
         country = request.data.get('country')
-        print("---Got the required parameter to send mail---",topic,toemail,toname,firstname,lastname,username,phoneCode,phoneNumber,usertype,country)
+        verified_phone = request.data.get('verified_phone')
+        verified_email = request.data.get('verified_email')
+        print("---Got the required parameter to send mail---",topic,toemail,toname,firstname,lastname,username,phoneCode,phoneNumber,usertype,country,verified_phone,verified_email)
         field = {
             "topic":topic
         }
@@ -266,7 +268,7 @@ class signupfeedbackmail(APIView):
         print("---Got the template the htmlContent---")
         phone = phoneCode + phoneNumber 
         print("---Got the phone----",phone)
-        emailBody = htmlTemplateContent.format(firstname,firstname,lastname,username,phone,toemail,usertype,country)
+        emailBody = htmlTemplateContent.format(firstname,firstname,lastname,username,phone,verified_phone,toemail,verified_phone,usertype,country)
         print("---sets all the fields---")
         configuration = sib_api_v3_sdk.Configuration()
         configuration.api_key['api-key'] = key
