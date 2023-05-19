@@ -266,7 +266,7 @@ class signupfeedbackmail(APIView):
         message = data['data']['template_data'][0]['htmlContent']
         htmlTemplateContent = gTH.getTemplateHTMLContent(key,templateName)[0]['htmlContent']
         print("---Got the template the htmlContent---")
-        phone = phoneCode + phoneNumber 
+        phone = f"{phoneCode} {phoneNumber}" 
         print("---Got the phone----",phone)
         emailBody = htmlTemplateContent.format(firstname,firstname,lastname,username,phone,verified_phone,toemail,verified_phone,usertype,country)
         print("---sets all the fields---")
