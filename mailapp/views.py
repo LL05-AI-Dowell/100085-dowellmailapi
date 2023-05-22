@@ -268,7 +268,7 @@ class signupfeedbackmail(APIView):
         print("---Got the template the htmlContent---")
         phone = f"{phoneCode} {phoneNumber}" 
         print("---Got the phone----",phone)
-        emailBody = htmlTemplateContent.format(firstname,firstname,lastname,username,phone,verified_phone,toemail,verified_phone,usertype,country)
+        emailBody = htmlTemplateContent.format(firstname,firstname,lastname,username,phone,verified_phone,toemail,verified_email,usertype,country)
         print("---sets all the fields---")
         configuration = sib_api_v3_sdk.Configuration()
         configuration.api_key['api-key'] = key
