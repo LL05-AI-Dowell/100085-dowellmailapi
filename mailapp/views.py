@@ -15,7 +15,7 @@ from database.database_management import *
 from mailapp.sendinblue import getTemplate as gt
 from mailapp.sendinblue import getHTMLContent as gTH
 import os
-
+from mailapp.zeroBounce import validateMail as vE 
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -168,27 +168,34 @@ class signUpOTPverification(APIView):
         fromemail = data['data']['fromAddress']
         subject = data['data']['subject']
         key = data['data']['key']
+        api_key = data['data']['api_key']
+        print("keys",key,api_key)
         message = data['data']['template_data'][0]['htmlContent']
         print("---Got the template the htmlContent---")
         emailBody = message.format(toname,otp)
-        configuration = sib_api_v3_sdk.Configuration()
-        configuration.api_key['api-key'] = key
-        api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
-        subject = subject
-        html_content = emailBody
-        sender = {"name": sender, "email": fromemail}
-        to = [{"email": toemail, "name": toname}]
-        headers = {"Some-Custom-Name": "unique-id-1234"}
-        print("---All the data are gethered and ready to send mail---")
-        send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(to=to, headers=headers,html_content=html_content, sender=sender, subject=subject)
-        try:
-            api_response = api_instance.send_transac_email(send_smtp_email)
-            api_response_dict = api_response.to_dict()
-            print("---The mail has been sent ! Happy :D---")
-            return Response({"MAIL INFO":"Mail has been sent!!","INFO":json.dumps(api_response_dict)},status=status.HTTP_200_OK)
-        except ApiException as e:
-            return Response({"error":"Exception when calling SMTPApi->send_transac_email: %s\n" % e},status=status.HTTP_400_BAD_REQUEST)
-        
+        print("---Checking whether email is valid---")
+        email_validation = vE.validateMail(api_key,toemail)
+        if email_validation['status'] == "valid":
+            print("---Email is valid---")
+            configuration = sib_api_v3_sdk.Configuration()
+            configuration.api_key['api-key'] = key
+            api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
+            subject = subject
+            html_content = emailBody
+            sender = {"name": sender, "email": fromemail}
+            to = [{"email": toemail, "name": toname}]
+            headers = {"Some-Custom-Name": "unique-id-1234"}
+            print("---All the data are gethered and ready to send mail---")
+            send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(to=to, headers=headers,html_content=html_content, sender=sender, subject=subject)
+            try:
+                api_response = api_instance.send_transac_email(send_smtp_email)
+                api_response_dict = api_response.to_dict()
+                print("---The mail has been sent ! Happy :D---")
+                return Response({"MAIL INFO":"Mail has been sent!!","INFO":json.dumps(api_response_dict)},status=status.HTTP_200_OK)
+            except ApiException as e:
+                return Response({"error":"Exception when calling SMTPApi->send_transac_email: %s\n" % e},status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({"status":"varification failed","error":email_validation['status']},status=status.HTTP_400_BAD_REQUEST)
 
 @method_decorator(csrf_exempt,name='dispatch')
 class feedbackSurvey(APIView):
@@ -428,4 +435,21 @@ class editormailcomponent(APIView):
             return Response({"MAIL INFO":"Mail has been sent!!","INFO":json.dumps(api_response_dict)},status=status.HTTP_200_OK)
         except ApiException as e:
             return Response({"error":"Exception when calling SMTPApi->send_transac_email: %s\n" % e},status=status.HTTP_400_BAD_REQUEST)
+        
+@method_decorator(csrf_exempt, name='dispatch')
+class validateEmailapi(APIView):
+    def post(self, request ):
+        topic = request.data.get('topic')
+        email = request.data.get('email')
+        print("---Got the required parameter to send mail---",topic,email)
+        field = {
+            "topic":topic
+        }
+        fetched_data = dowellconnection(*Email_management,"find",field)
+        data = json.loads(fetched_data)
+        key = data['data']['key']
+        api_key = data['data']['api_key']
+        print("keys",key,api_key)
+        response = vE.validateMail(api_key,email)
+        return Response(response)
         
