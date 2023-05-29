@@ -27,6 +27,7 @@ class mailSetting(APIView):
         templateName = request.data.get('templateName')
         subject = request.data.get('subject')
         topic = request.data.get('topic')
+        api_key = request.data.get('apiKey')
         print("---Got the key from the database---")
         get_data = gt.getTemplate(key)
         print("---Template fetching from sedinblue database---")
@@ -47,6 +48,7 @@ class mailSetting(APIView):
             "templateName" : templateName,
             "subject" : subject,
             "topic" : topic,
+            "api_key":api_key,
             "template_data": result
         }
         print("---Data inserting Now---")

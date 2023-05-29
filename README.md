@@ -42,7 +42,8 @@ Request Body
     "fromName" : "<sender Name>",
     "templateName" : "<Template Name>",
     "subject" : "<Your subject>",
-    "topic" : "<Your Topic>"
+    "topic" : "<Your Topic>",
+    "apiKey": "<API Key>"
 }
 ```
 Response-201
