@@ -18,9 +18,7 @@ from mailapp.sendinblue import getHTMLContent as gTH
 class generateKey(APIView):
     def post(self, request):
         field = {
-            "uuid": generate_uuid(),
-            "is_active": True,
-            "is_valid": 14
+            "uuid": generate_uuid()
         }
         serializer = ApiKeySerializer(data=field)
         if serializer.is_valid():
