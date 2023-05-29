@@ -20,5 +20,6 @@ from serverstatus import *
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', serverReports.as_view()),
-    path('api/',(include('mailapp.urls')))
+    path('api/',(include('mailapp.urls'))),
+    path('api/v1/',(include('app.urls')))
 ]
