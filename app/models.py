@@ -3,7 +3,7 @@ from django.db import models
 class ApiKey(models.Model):
     uuid = models.CharField(max_length=255, unique=True)
     is_active = models.BooleanField(default=True)
-    is_valid = models.IntegerField(default=14)
+    is_valid = models.IntegerField(default=3)
 
     def __str__(self):
         return str(self.uuid)
