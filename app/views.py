@@ -38,12 +38,22 @@ class generateKey(APIView):
         
         serializer = ApiKeySerializer(api_key)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    def get(self, request):
+        try:
+            api_key = ApiKey.objects.all()
+        except ApiKey.DoesNotExist:
+            return Response("API Key not found.", status=status.HTTP_404_NOT_FOUND)
+        for i in api_key:
+            if i.is_paid:
+                i.is_valid = 25
+                i.save()
+        
+        return Response("API valid count updated successfully.", status=status.HTTP_200_OK)
     
-
 @method_decorator(csrf_exempt, name='dispatch')
 class sendmail(APIView):
     def post(self, request, uuid):
-        topic = request.data.get('topic')
+        topic = "EditorMailComponent"
         toemail = request.data.get('toEmail')
         toname = request.data.get('toName')
         fromName = request.data.get('fromName')
