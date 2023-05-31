@@ -137,11 +137,9 @@ class sendmail(APIView):
                     return Response({"error":"Exception when calling SMTPApi->send_transac_email: %s\n" % e},status=status.HTTP_400_BAD_REQUEST)
             else:
                 return Response({
-                    "success": False,
-                    "message":f"The {toemail} is not a valid email!!",
-                    "send status":json.dumps(api_response_dict),
-                    "is_valid_count":serializer.data["is_valid"]
-                },status=status.HTTP_404_NOT_FOUND)
+                "success": False,
+                "message": f"Sorry ! {toemail} is not a valid email"  
+            },status=status.HTTP_401_UNAUTHORIZED)
         else:
             return Response({
                 "success": False,
