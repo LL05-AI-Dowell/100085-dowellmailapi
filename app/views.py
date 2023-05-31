@@ -140,7 +140,7 @@ class validateEmailapi(APIView):
     def get(self, request, email ):
         SECRET_KEY = str(os.getenv('SECRET_KEY'))  
         email = request.data.get('email')
-        print("---Got the required parameter to send mail---",email)
+        print("---Got the required parameter to send mail---",email,SECRET_KEY)
         email_validation = validateMail(SECRET_KEY,email)
         print(email_validation)
         if email_validation['status'] == "valid":
