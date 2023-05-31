@@ -451,7 +451,14 @@ class validateEmailapi(APIView):
         data = json.loads(fetched_data)
         key = data['data']['key']
         api_key = data['data']['api_key']
-        print("keys",key,api_key)
-        response = vE.validateMail(api_key,email)
-        return Response(response)
-        
+        email_validation = vE.validateMail(api_key,email)
+        if email_validation['status'] == "valid":
+            return Response({
+                "success": True,
+                "message": f"Hurray ! {email} is a valid email"  
+            },status=status.HTTP_200_OK)
+        else:
+            return Response({
+                "success": False,
+                "message": f"Sorry ! {email} is not a valid email"  
+            },status=status.HTTP_401_UNAUTHORIZED)
