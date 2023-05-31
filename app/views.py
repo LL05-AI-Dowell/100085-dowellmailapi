@@ -15,7 +15,8 @@ from database.database_management import *
 from mailapp.sendinblue import getHTMLContent as gTH
 from dotenv import load_dotenv
 
-load_dotenv()
+# load_dotenv()
+load_dotenv("/home/100085/100085-dowellmailapi/.env")
 
 @method_decorator(csrf_exempt, name='dispatch')
 class generateKey(APIView):
