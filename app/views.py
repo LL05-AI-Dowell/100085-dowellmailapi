@@ -45,6 +45,7 @@ class generateKey(APIView):
         
         return Response("API valid count updated successfully.", status=status.HTTP_200_OK)
     
+    
 @method_decorator(csrf_exempt, name='dispatch')
 class sendmail(APIView):
     def post(self, request, uuid):
