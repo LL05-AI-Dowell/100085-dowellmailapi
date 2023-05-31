@@ -1,3 +1,4 @@
+import os
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -12,7 +13,9 @@ from .models import ApiKey
 from .serializers import *
 from database.database_management import *
 from mailapp.sendinblue import getHTMLContent as gTH
+from dotenv import load_dotenv
 
+load_dotenv()
 
 @method_decorator(csrf_exempt, name='dispatch')
 class generateKey(APIView):
@@ -132,6 +135,24 @@ class sendmail(APIView):
             return Response({"message": "Limit exceeded"}, status=status.HTTP_200_OK)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
+class validateEmailapi(APIView):
+    def get(self, request, email ):
+        SECRET_KEY = str(os.getenv('SECRET_KEY'))  
+        email = request.data.get('email')
+        print("---Got the required parameter to send mail---",email)
+        email_validation = validateMail(SECRET_KEY,email)
+        print(email_validation)
+        if email_validation['status'] == "valid":
+            return Response({
+                "success": True,
+                "message": f"Hurray ! {email} is a valid email"  
+            },status=status.HTTP_200_OK)
+        else:
+            return Response({
+                "success": False,
+                "message": f"Sorry ! {email} is not a valid email"  
+            },status=status.HTTP_401_UNAUTHORIZED)
 
 
 
