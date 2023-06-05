@@ -44,7 +44,16 @@ class generateKey(APIView):
                 i.save()
         
         return Response("API valid count updated successfully.", status=status.HTTP_200_OK)
-      
+    
+    def get(self, request):
+        username = request.GET.get('user')
+        if username == "manish":
+            api_keys = ApiKey.objects.all()
+            print(api_keys)
+            return Response(list(api_keys.values()), status=status.HTTP_200_OK)
+        else:
+            return Response("Invalid username", status=status.HTTP_400_BAD_REQUEST)
+
 @method_decorator(csrf_exempt, name='dispatch')
 class sendmail(APIView):
     def post(self, request, uuid):
@@ -152,3 +161,42 @@ class sendmail(APIView):
             "message": "Invalid request type"
         }, status=status.HTTP_400_BAD_REQUEST)
     
+
+@method_decorator(csrf_exempt, name='dispatch')
+class test_api_key(APIView):
+    def post(self, request):
+        fields = {
+            "name": request.data.get('name'),
+            "email": request.data.get('email'),
+            "uuid": generate_uuid()
+        }
+
+        return Response({
+            "success": True,
+            "message": "Test api key was successfully created",
+            "info": fields
+        }, status=status.HTTP_200_OK)
+    def get(self, request):
+        username = request.GET.get('user')
+        if username == "manish":
+            data = [
+                {
+                    "id": 1,
+                    "uuid": "xyz-abc-efg",
+                    "name": "Name",
+                    "email": "email@gmail.com",
+                    "is_active": True,
+                    "is_valid": 25,
+                    "is_paid": False
+                }
+            ]
+            return Response({
+                "success": True,
+                "message": "Data was successfully retrieved",
+                "info": data
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({
+                "status" :False,
+                "message" : f"{username} is not authorized"
+            })
