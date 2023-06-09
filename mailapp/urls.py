@@ -13,4 +13,5 @@ urlpatterns = [
     path('sms/',dowellSMS.as_view()),
     path('editor-component/',editormailcomponent.as_view()),
     path('validate-mail/',validateEmailapi.as_view()),
+    path('send-invitation/',send_invitation.as_view()),
 ]
