@@ -16,7 +16,12 @@ from mailapp.sendinblue import getTemplate as gt
 from mailapp.sendinblue import getHTMLContent as gTH
 import os
 from mailapp.zeroBounce import validateMail as vE 
+from mailapp.zeroBounce.validateMail import emailFinder
+from dotenv import load_dotenv
 
+# load_dotenv()
+load_dotenv("/home/100085/100085-dowellmailapi/.env")
+SECRET_KEY = str(os.getenv('SECRET_KEY')) 
 
 @method_decorator(csrf_exempt, name='dispatch')
 class mailSetting(APIView):
@@ -508,4 +513,25 @@ class send_invitation(APIView):
                 return Response({"error":"Exception when calling SMTPApi->send_transac_email: %s\n" % e},status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({"status":"varification failed","error":email_validation['status']},status=status.HTTP_400_BAD_REQUEST)
+
+@method_decorator(csrf_exempt, name='dispatch')
+class email_domainFinder(APIView):
+    def post(self, request):
+        name = request.data.get('name')
+        domain = request.data.get('domain')
+        print(name, domain)
+        emailFiderStatus = emailFinder(SECRET_KEY, domain, name)
+        if emailFiderStatus['status'] == "valid":
+            return Response({
+                "success": True,
+                "message":"found a valid email",
+                "result": emailFiderStatus
+            })
+        else :
+            return Response({
+                "success": False,
+                "message":"Not found a valid email",
+                "result": emailFiderStatus
+            })
+    
 

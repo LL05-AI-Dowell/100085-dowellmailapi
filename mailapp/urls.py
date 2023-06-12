@@ -14,4 +14,5 @@ urlpatterns = [
     path('editor-component/',editormailcomponent.as_view()),
     path('validate-mail/',validateEmailapi.as_view()),
     path('send-invitation/',send_invitation.as_view()),
+    path('email-finder/',email_domainFinder.as_view()),
 ]
