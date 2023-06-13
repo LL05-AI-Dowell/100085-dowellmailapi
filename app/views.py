@@ -47,6 +47,7 @@ class generateKey(APIView):
     
     def get(self, request):
         username = request.GET.get('user')
+        print(username)
         if username == "manish":
             api_keys = ApiKey.objects.all()
             print(api_keys)
@@ -60,27 +61,43 @@ class sendmail(APIView):
         type_request = request.GET.get('type')
 
         if type_request == "validate":
-            return self.validate_email(request)
+            return self.validate_email(request,uuid)
         elif type_request == 'send-email':
             return self.send_email(request,uuid)
+        elif type_request == 'email-finder':
+            return self.email_finder(request,uuid)
         else:
             return self.handle_error(request)
 
-    def validate_email(self, request):
+    def validate_email(self, request,uuid):
         email = request.data.get('email')
-        print("---Got the required parameter to send mail---",email,SECRET_KEY)
+        print("---Got the required parameter to send mail---",email)
+        try:
+            api_key = ApiKey.objects.get(uuid=uuid)
+            print("---Got apiKey---",api_key)
+        except ApiKey.DoesNotExist:
+            return Response("API Key not found.", status=status.HTTP_404_NOT_FOUND)
+        
+        api_key.is_valid -= 1
+        api_key.save()
+
         email_validation = validateMail(SECRET_KEY,email)
-        print(email_validation)
-        if email_validation['status'] == "valid":
-            return Response({
-                "success": True,
-                "message": f"Hurray ! {email} is a valid email"  
-            },status=status.HTTP_200_OK)
+        if api_key.is_valid >= 0:
+            if email_validation['status'] == "valid":
+                return Response({
+                    "success": True,
+                    "message": f"Hurray ! {email} is a valid email"  
+                },status=status.HTTP_200_OK)
+            else:
+                return Response({
+                    "success": False,
+                    "message": f"Sorry ! {email} is not a valid email"  
+                },status=status.HTTP_401_UNAUTHORIZED)
         else:
             return Response({
                 "success": False,
-                "message": f"Sorry ! {email} is not a valid email"  
-            },status=status.HTTP_401_UNAUTHORIZED)
+                "message": "Limit exceeded"
+            }, status=status.HTTP_423_LOCKED)
         
     def send_email(self, request ,uuid):
         topic = "EditorMailComponent"
@@ -154,14 +171,45 @@ class sendmail(APIView):
                 "success": False,
                 "message": "Limit exceeded"
             }, status=status.HTTP_423_LOCKED)
+
+    def email_finder(self,request,uuid):
+        name = request.data.get('name')
+        domain = request.data.get('domain')
+        print(name, domain,uuid)
+        try:
+            api_key = ApiKey.objects.get(uuid=uuid)
+            print("---Got apiKey---",api_key)
+        except ApiKey.DoesNotExist:
+            return Response("API Key not found.", status=status.HTTP_404_NOT_FOUND)
         
+        api_key.is_valid -= 1
+        api_key.save()
+        if api_key.is_valid >= 0:
+            emailFiderStatus = emailFinder(SECRET_KEY, domain, name)
+            if emailFiderStatus['status'] == "valid":
+                return Response({
+                    "success": True,
+                    "message":"found a valid email",
+                    "result": emailFiderStatus
+                })
+            else :
+                return Response({
+                    "success": False,
+                    "message":"Not found a valid email",
+                    "result": emailFiderStatus
+                })
+        else:
+            return Response({
+                "success": False,
+                "message": "Limit exceeded"
+            }, status=status.HTTP_423_LOCKED)
+
     def handle_error(self, request):
         return Response({
             "success": False,
             "message": "Invalid request type"
         }, status=status.HTTP_400_BAD_REQUEST)
     
-
 @method_decorator(csrf_exempt, name='dispatch')
 class test_api_key(APIView):
     def post(self, request):

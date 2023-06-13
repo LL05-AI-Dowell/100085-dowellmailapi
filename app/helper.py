@@ -79,3 +79,10 @@ def validateMail(api_key,email):
 
     response = requests.get(url, params=params)
     return json.loads(response.content)
+
+
+def emailFinder(api_key, domain, name):
+    url = "https://api.zerobounce.net/v2/guessformat"
+    params = {"api_key": api_key, "domain": domain, "first_name": name}
+    response = requests.get(url, params=params)
+    return json.loads(response.content)
