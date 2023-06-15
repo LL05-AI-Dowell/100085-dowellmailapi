@@ -196,7 +196,7 @@ class sendmail(APIView):
                 return Response({
                     "success": False,
                     "message":"Not found a valid email",
-                    "result": emailFiderStatus
+                    "result": emailFiderStatus["failure_reason"]
                 })
         else:
             return Response({
