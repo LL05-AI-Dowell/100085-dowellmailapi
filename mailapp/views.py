@@ -9,6 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 import sib_api_v3_sdk
 from sib_api_v3_sdk.rest import ApiException
 import json
+from app.helper import validateMail
 from database.dowellconnection import dowellconnection , dowellconnectionupdate
 from database.dowelleventcreation import get_event_id
 from database.database_management import *
@@ -104,6 +105,26 @@ class SendEmail(APIView):
         
 @method_decorator(csrf_exempt,name ='dispatch')
 class subscriberList(APIView):
+    def get(self, request):
+        field = {
+            "eventId": "FB1010000000000000000000003004"
+        }
+        fetchData = dowellconnection(*subscriber_management,"fetch",field)
+        print("---",json.loads(fetchData))
+        if(len(json.loads(fetchData)["data"]) == 0):
+            return Response({
+                "success": False,
+                "message": "No subscriber yet",
+                "data":json.loads(fetchData),
+            })
+        else:
+            return Response({
+                "status":True,
+                "message": "Subscriber list",
+                "data":json.loads(fetchData)
+            })
+    
+
     def post(self, request):
         topic = request.data.get("topic")
         subscriberEmail = request.data.get("subscriberEmail")
@@ -115,21 +136,43 @@ class subscriberList(APIView):
             missing_values = [key for key, value in request.data.items() if not value]
             return Response({"INFO":f"{', '.join(missing_values)} are missing!"}, status=status.HTTP_400_BAD_REQUEST)
         else:
-            print("---All parameters are ok and ready to insert to our database---")
-            field = {
-                "eventId": get_event_id()['event_id'],
-                "topic":topic,
-                "subscriberEmail":subscriberEmail,
-                "subscriberStatus":subscriberStatus,
-                "typeOfSubscriber":typeOfSubscriber
-            }
-            print("---Data inserting now---")
-            inserted_data = dowellconnection(*subscriber_management,"insert",field)
-            if inserted_data:
-                print("---Data has been inserted---")
-                return Response({"INFO": f"{typeOfSubscriber} has subscribed","DATABASE_INFO":json.loads(inserted_data)}, status=status.HTTP_200_OK)
+            email_validation = validateMail(SECRET_KEY,subscriberEmail)
+            print("---Checking the the email is valid---")
+            if email_validation['status'] == "valid":
+                print("---Email is verified---")
+                print("---All parameters are ok and ready to insert to our database---")
+                field = {
+                    "eventId": get_event_id()['event_id'],
+                    "topic":topic,
+                    "subscriberEmail":subscriberEmail,
+                    "subscriberStatus":subscriberStatus,
+                    "typeOfSubscriber":typeOfSubscriber
+                }
+                print("---Data inserting now---")
+                inserted_data = dowellconnection(*subscriber_management,"insert",field)
+                if inserted_data:
+                    print("---Data has been inserted---")
+                    return Response({
+                        "success": True,
+                        "message": f"{subscriberEmail} has subscribed",
+                        "DATABASE_INFO":json.loads(inserted_data),
+                        "subscriber":{
+                            "topic":topic,
+                            "subscriberEmail":subscriberEmail,
+                            "subscriberStatus":subscriberStatus,
+                            "typeOfSubscriber":typeOfSubscriber
+                        }
+                    }, status=status.HTTP_200_OK)
+                else:
+                    return Response({
+                        "success": True,
+                        "message":"Something went wrong while inserting to database!"
+                    }, status=status.HTTP_400_BAD_REQUEST)
             else:
-                return Response({"INFO":"Something went wrong!"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({
+                    "status": False,
+                    "message":"it is not a valid email address"
+                }, status=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION)
 
 
     def put(self,request):
@@ -153,9 +196,62 @@ class subscriberList(APIView):
             print("---Provided email was subscribed to the topic and Unsubscribing---")
             update_response = dowellconnectionupdate(*subscriber_management,"update",field,update_field)
             print("---Unsubscribed ! SAD---")
-            return Response({"INFO":"User has unsubscribed" , "DATABASE_INFO":json.loads(update_response)},status=status.HTTP_202_ACCEPTED)
+            return Response({
+                "status": True,
+                "message":"User has unsubscribed" , 
+                "DATABASE_INFO":json.loads(update_response)
+            },status=status.HTTP_202_ACCEPTED)
         else:
-            return Response({"INFO":"Already an unsubscribed!"},status=status.HTTP_406_NOT_ACCEPTABLE)
+            return Response({
+                "status": False,
+                "message":"Already an unsubscribed!"
+            },status=status.HTTP_406_NOT_ACCEPTABLE)
+        
+@method_decorator(csrf_exempt, name='dispatch')
+class subscribeToInternalTeam(APIView):
+
+    def get(self,request):
+        topic = request.GET.get('topic')
+        subscriberEmail = request.GET.get('email')
+        typeOfSubscriber = request.GET.get('types')
+
+        email_validation = validateMail(SECRET_KEY,subscriberEmail)
+        print("---Checking the the email is valid---")
+        if email_validation['status'] == "valid":
+            print("---Email is verified---")
+            print("---All parameters are ok and ready to insert to our database---")
+            field = {
+                "eventId": get_event_id()['event_id'],
+                "topic":topic,
+                "subscriberEmail":subscriberEmail,
+                "subscriberStatus":True,
+                "typeOfSubscriber":typeOfSubscriber
+            }
+            print("---Data inserting now---")
+            inserted_data = dowellconnection(*subscriber_management,"insert",field)
+            if inserted_data:
+                print("---Data has been inserted---")
+                return Response({
+                    "success": True,
+                    "message": f"Thank you {subscriberEmail} for subscribing to our newsletter",
+                    "DATABASE_INFO":json.loads(inserted_data),
+                    "subscriber":{
+                        "topic":topic,
+                        "subscriberEmail":subscriberEmail,
+                        "subscriberStatus":True,
+                        "typeOfSubscriber":typeOfSubscriber
+                    }
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response({
+                    "success": True,
+                    "message":"Something went wrong while inserting to database!"
+                }, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({
+                "status": False,
+                "message":"it is not a valid email address"
+            }, status=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION)
         
 
 @method_decorator(csrf_exempt,name ='dispatch')
