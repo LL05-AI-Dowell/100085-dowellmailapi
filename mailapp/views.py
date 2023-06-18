@@ -199,7 +199,7 @@ class subscriberList(APIView):
             return Response({
                 "status": True,
                 "message":"We are sorry you have unsubscribed from us, and we hope you will consider subscribing soon." , 
-                "DATABASE_INFO":json.loads(update_response)
+                "Subscriber Email Address": subscriberEmail
             },status=status.HTTP_202_ACCEPTED)
         else:
             return Response({
