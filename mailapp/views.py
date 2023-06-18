@@ -198,7 +198,7 @@ class subscriberList(APIView):
             print("---Unsubscribed ! SAD---")
             return Response({
                 "status": True,
-                "message":"User has unsubscribed" , 
+                "message":"We are sorry you have unsubscribed from us, and we hope you will consider subscribing soon." , 
                 "DATABASE_INFO":json.loads(update_response)
             },status=status.HTTP_202_ACCEPTED)
         else:
