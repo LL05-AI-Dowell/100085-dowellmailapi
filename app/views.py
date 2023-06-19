@@ -412,7 +412,7 @@ class subscribeToNewsletters(APIView):
                     "success": False,
                     "message": f"{subscriberEmail} is not a valid email",
                     "Count": serializer.data["is_valid"]
-                },status=status.HTTP_401_UNAUTHORIZEDIT)    
+                },status=status.HTTP_400_BAD_REQUEST)    
                
     def put(self,request,uuid):
         try:
