@@ -6,4 +6,5 @@ urlpatterns = [
     path('generate-api-key/<str:uuid>/',generateKey.as_view()),
     path('mail/<str:uuid>/',sendmail.as_view()),
     path('test-api-key/',test_api_key.as_view()),
+    path('subscribe-newsletter/<str:uuid>/',subscribeToNewsletters.as_view()),
 ]
