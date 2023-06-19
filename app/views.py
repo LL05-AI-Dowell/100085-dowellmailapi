@@ -268,7 +268,7 @@ class subscribeToNewsletters(APIView):
             "success": True,
             "message": "List of subscriber",
             "Details": json.loads(fetch_data)
-        })
+        },status=status.HTTP_200_OK)
         
     def post(self,request,uuid):
         topic = request.data.get("topic")
@@ -329,7 +329,7 @@ class subscribeToNewsletters(APIView):
                         "Details": field,
                         "DATABASE INFO":json.loads(insert_subscriber_data),
                         "Count": serializer.data["is_valid"]
-                    })
+                    },status=status.HTTP_201_CREATED)
                 else:
                     list_subscriber = []
                     for item in response['data']:
@@ -359,7 +359,7 @@ class subscribeToNewsletters(APIView):
                                 "status":True,
                                 "message":f"{subscriberEmail} has already subscribed",
                                 "Count": serializer.data["is_valid"]
-                            })
+                            },status=status.HTTP_409_CONFLICT)
                         else:
                             print("The combination is present but the status is false.")
                             for item in list_subscriber:
@@ -376,12 +376,12 @@ class subscribeToNewsletters(APIView):
                                         "status":True, 
                                         "message":f"{subscriberEmail} resubscribed to the newsletter",
                                         "Count": serializer.data["is_valid"]
-                                    })
+                                    },status=status.HTTP_208_ALREADY_REPORTED)
                                 else:
                                     return Response({
                                         "status":False,
                                         "message": "Something went wrong while updating subscriber"
-                                    })          
+                                    },status=status.HTTP_400_BAD_REQUEST)          
                     else:
                         print("The user is not subscribed to particular combination , starting the subscription process")
                         field = {
@@ -406,13 +406,13 @@ class subscribeToNewsletters(APIView):
                             "Details": field,
                             "DATABASE INFO":json.loads(insert_subscriber_data),
                             "Count": serializer.data["is_valid"]
-                        })
+                        },status=status.HTTP_201_CREATED)
             else:
                 return Response({
                     "success": False,
                     "message": f"{subscriberEmail} is not a valid email",
                     "Count": serializer.data["is_valid"]
-                })    
+                },status=status.HTTP_401_UNAUTHORIZEDIT)    
                
     def put(self,request,uuid):
         try:
