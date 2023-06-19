@@ -325,7 +325,7 @@ class subscribeToNewsletters(APIView):
                     
                     return Response({
                         "success": True,
-                        "message": f"Thank you for subscribing to our newsletter , {subscriberEmail}",
+                        "message": "Thank you for subscribing to our newsletter !",
                         "Details": field,
                         "DATABASE INFO":json.loads(insert_subscriber_data),
                         "Count": serializer.data["is_valid"]
@@ -357,7 +357,7 @@ class subscribeToNewsletters(APIView):
                             print("The combination is present and the status is true.")
                             return Response({
                                 "status":True,
-                                "message":f"{subscriberEmail} has already subscribed",
+                                "message":f"User has already subscribed",
                                 "Count": serializer.data["is_valid"]
                             },status=status.HTTP_409_CONFLICT)
                         else:
@@ -374,7 +374,7 @@ class subscribeToNewsletters(APIView):
                                     update_subscriber_data = dowellconnection(*subscriber_management,"update",field,update_field)
                                     return Response({
                                         "status":True, 
-                                        "message":f"{subscriberEmail} resubscribed to the newsletter",
+                                        "message":"Thank you resubscribing to the newsletter",
                                         "Count": serializer.data["is_valid"]
                                     },status=status.HTTP_208_ALREADY_REPORTED)
                                 else:
@@ -402,7 +402,7 @@ class subscribeToNewsletters(APIView):
                         
                         return Response({
                             "success": True,
-                            "message": f"Thank you for subscribing to our newsletter , {subscriberEmail}",
+                            "message": "Thank you for subscribing to our newsletter !",
                             "Details": field,
                             "DATABASE INFO":json.loads(insert_subscriber_data),
                             "Count": serializer.data["is_valid"]
