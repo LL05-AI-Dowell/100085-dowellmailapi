@@ -302,88 +302,12 @@ class subscribeToNewsletters(APIView):
             fetch_all_subscriber = dowellconnection(*subscriber_management,"fetch",field,update_field)
             response = json.loads(fetch_all_subscriber)
             print("---all subacriber data is fetched---")
-            email_validation = validateMail(SECRET_KEY,subscriberEmail)
-            print("---Checking the the email is valid---")
-            if email_validation['status'] == "valid":
-                print("---Email is verified and Starting subscription Processing---")
-                if(len(response["data"]) == 0):
-                    field = {
-                        "eventId": get_event_id()['event_id'],
-                        "topic":topic,
-                        "subscriberEmail":subscriberEmail,
-                        "subscriberStatus":subscriberStatus,
-                        "typeOfSubscriber":typeOfSubscriber,
-                        "APIKey":uuid,
-                        "API Owner Name": serializer.data["name"],
-                        "API Owner Email": serializer.data["email"]
-                    }
-                    update_field = {
-                        "status": "OK",
-                    }
-                    insert_subscriber_data = dowellconnection(*subscriber_management,"insert",field,update_field)
-                    print("---inserting data to database---")
-                    
-                    return Response({
-                        "success": True,
-                        "message": "Thank you for subscribing to our newsletter !",
-                        "Details": field,
-                        "DATABASE INFO":json.loads(insert_subscriber_data),
-                        "Count": serializer.data["is_valid"]
-                    },status=status.HTTP_201_CREATED)
-                else:
-                    list_subscriber = []
-                    for item in response['data']:
-                        listOfSubscriber = {
-                            'document_id': item['_id'],
-                            'subscriberEmail': item['subscriberEmail'],
-                            'typeOfSubscriber': item['typeOfSubscriber'],
-                            'subscriberStatus': item['subscriberStatus']
-                        }
-                        list_subscriber.append(listOfSubscriber)
-                    field = {
-                        "subscriberEmail":subscriberEmail,
-                        "subscriberStatus":subscriberStatus,
-                        "typeOfSubscriber":typeOfSubscriber
-                    }
-                    combination_present = False
-                    subscribed = False
-                    for item in list_subscriber:
-                        if item['subscriberEmail'] == field['subscriberEmail'] and item['typeOfSubscriber'] == field['typeOfSubscriber']:
-                            combination_present = True
-                            subscribed = item['subscriberStatus']
-                            break
-                    if combination_present:
-                        if subscribed:
-                            print("The combination is present and the status is true.")
-                            return Response({
-                                "success":True,
-                                "message":f"User has already subscribed",
-                                "Count": serializer.data["is_valid"]
-                            },status=status.HTTP_200_OK)
-                        else:
-                            print("The combination is present but the status is false.")
-                            for item in list_subscriber:
-                                if item['subscriberEmail'] == field['subscriberEmail'] and item['typeOfSubscriber'] == field['typeOfSubscriber']:
-                                    field = {
-                                        "_id": item['document_id']
-                                    }
-                                    update_field = {
-                                        "subscriberStatus": True
-                                    }
-                                    print("---The updation process started---")
-                                    update_subscriber_data = dowellconnection(*subscriber_management,"update",field,update_field)
-                                    return Response({
-                                        "status":True, 
-                                        "message":"Thank you resubscribing to the newsletter",
-                                        "Count": serializer.data["is_valid"]
-                                    },status=status.HTTP_208_ALREADY_REPORTED)
-                                else:
-                                    return Response({
-                                        "status":False,
-                                        "message": "Something went wrong while updating subscriber"
-                                    },status=status.HTTP_400_BAD_REQUEST)          
-                    else:
-                        print("The user is not subscribed to particular combination , starting the subscription process")
+            if api_key.is_valid >= 0:
+                email_validation = validateMail(SECRET_KEY,subscriberEmail)
+                print("---Checking the the email is valid---")
+                if email_validation['status'] == "valid":
+                    print("---Email is verified and Starting subscription Processing---")
+                    if(len(response["data"]) == 0):
                         field = {
                             "eventId": get_event_id()['event_id'],
                             "topic":topic,
@@ -407,12 +331,94 @@ class subscribeToNewsletters(APIView):
                             "DATABASE INFO":json.loads(insert_subscriber_data),
                             "Count": serializer.data["is_valid"]
                         },status=status.HTTP_201_CREATED)
+                    else:
+                        list_subscriber = []
+                        for item in response['data']:
+                            listOfSubscriber = {
+                                'document_id': item['_id'],
+                                'subscriberEmail': item['subscriberEmail'],
+                                'typeOfSubscriber': item['typeOfSubscriber'],
+                                'subscriberStatus': item['subscriberStatus']
+                            }
+                            list_subscriber.append(listOfSubscriber)
+                        field = {
+                            "subscriberEmail":subscriberEmail,
+                            "subscriberStatus":subscriberStatus,
+                            "typeOfSubscriber":typeOfSubscriber
+                        }
+                        combination_present = False
+                        subscribed = False
+                        for item in list_subscriber:
+                            if item['subscriberEmail'] == field['subscriberEmail'] and item['typeOfSubscriber'] == field['typeOfSubscriber']:
+                                combination_present = True
+                                subscribed = item['subscriberStatus']
+                                break
+                        if combination_present:
+                            if subscribed:
+                                print("The combination is present and the status is true.")
+                                return Response({
+                                    "success":True,
+                                    "message":f"User has already subscribed",
+                                    "Count": serializer.data["is_valid"]
+                                },status=status.HTTP_200_OK)
+                            else:
+                                print("The combination is present but the status is false.")
+                                for item in list_subscriber:
+                                    if item['subscriberEmail'] == field['subscriberEmail'] and item['typeOfSubscriber'] == field['typeOfSubscriber']:
+                                        field = {
+                                            "_id": item['document_id']
+                                        }
+                                        update_field = {
+                                            "subscriberStatus": True
+                                        }
+                                        print("---The updation process started---")
+                                        update_subscriber_data = dowellconnection(*subscriber_management,"update",field,update_field)
+                                        return Response({
+                                            "status":True, 
+                                            "message":"Thank you resubscribing to the newsletter",
+                                            "Count": serializer.data["is_valid"]
+                                        },status=status.HTTP_208_ALREADY_REPORTED)
+                                    else:
+                                        return Response({
+                                            "status":False,
+                                            "message": "Something went wrong while updating subscriber"
+                                        },status=status.HTTP_400_BAD_REQUEST)          
+                        else:
+                            print("The user is not subscribed to particular combination , starting the subscription process")
+                            field = {
+                                "eventId": get_event_id()['event_id'],
+                                "topic":topic,
+                                "subscriberEmail":subscriberEmail,
+                                "subscriberStatus":subscriberStatus,
+                                "typeOfSubscriber":typeOfSubscriber,
+                                "APIKey":uuid,
+                                "API Owner Name": serializer.data["name"],
+                                "API Owner Email": serializer.data["email"]
+                            }
+                            update_field = {
+                                "status": "OK",
+                            }
+                            insert_subscriber_data = dowellconnection(*subscriber_management,"insert",field,update_field)
+                            print("---inserting data to database---")
+                            
+                            return Response({
+                                "success": True,
+                                "message": "Thank you for subscribing to our newsletter !",
+                                "Details": field,
+                                "DATABASE INFO":json.loads(insert_subscriber_data),
+                                "Count": serializer.data["is_valid"]
+                            },status=status.HTTP_201_CREATED)
+                else:
+                    return Response({
+                        "success": False,
+                        "message": f"{subscriberEmail} is not a valid email",
+                        "Count": serializer.data["is_valid"]
+                    },status=status.HTTP_200_OK)   
             else:
                 return Response({
-                    "success": False,
-                    "message": f"{subscriberEmail} is not a valid email",
-                    "Count": serializer.data["is_valid"]
-                },status=status.HTTP_400_BAD_REQUEST)    
+                "success": False,
+                "message": "Limit exceeded"
+            }, status=status.HTTP_423_LOCKED)
                
     def put(self,request,uuid):
         try:
