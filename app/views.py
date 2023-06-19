@@ -359,7 +359,7 @@ class subscribeToNewsletters(APIView):
                                 "success":True,
                                 "message":f"User has already subscribed",
                                 "Count": serializer.data["is_valid"]
-                            },status=status.HTTP_409_CONFLICT)
+                            },status=status.HTTP_200_OK)
                         else:
                             print("The combination is present but the status is false.")
                             for item in list_subscriber:
