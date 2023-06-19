@@ -356,7 +356,7 @@ class subscribeToNewsletters(APIView):
                         if subscribed:
                             print("The combination is present and the status is true.")
                             return Response({
-                                "status":True,
+                                "success":True,
                                 "message":f"User has already subscribed",
                                 "Count": serializer.data["is_valid"]
                             },status=status.HTTP_409_CONFLICT)
@@ -448,12 +448,12 @@ class subscribeToNewsletters(APIView):
             update_response = dowellconnection(*subscriber_management,"update",field,update_field)
             print("---Unsubscribed ! SAD---")
             return Response({
-                "status": True,
+                "success": True,
                 "message":"We are sorry you have unsubscribed from us, and we hope you will consider subscribing soon." , 
                 "Subscriber Email Address": subscriberEmail
             },status=status.HTTP_202_ACCEPTED)
         else:
             return Response({
-                "status": False,
+                "success": False,
                 "message":"Already an unsubscribed!"
             },status=status.HTTP_406_NOT_ACCEPTABLE)
