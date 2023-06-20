@@ -463,7 +463,7 @@ class subscribeToNewsletters(APIView):
         subscribed = False
         print("---subscriber status---",subscribed)
         for item in response["data"]:
-            if (item["subscriberEmail"] == field["subscriberEmail"] and item["topic"] == "Internal updates weekly" and item["subscriberStatus"] == True):
+            if (item["subscriberEmail"] == field["subscriberEmail"] and item["topic"] == field["topic"] and item["subscriberStatus"] == True):
                 combination_present = True
                 subscribed = item["subscriberStatus"]
                 print("---no subscribed status---", subscribed)
@@ -472,12 +472,12 @@ class subscribeToNewsletters(APIView):
         if combination_present:
             if subscribed:
                 print("The combination is present and the status is true.")
-                for item in list_subscriber:
-                    if item['subscriberEmail'] == field['subscriberEmail'] and item['topic'] == field['topic']:
+                for item in response["data"]:
+                    if item['subscriberEmail'] == field['subscriberEmail'] and item['topic'] == field['topic'] and item["subscriberStatus"] == True:
                         print("---item[subscriberEmail]---",item['subscriberEmail'])
                         print("---item again---",item)
                         field = {
-                            "_id": item['document_id']
+                            "_id": response["data]["_id"]
                         }
                         update_field = {
                             "subscriberStatus": False
