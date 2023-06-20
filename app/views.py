@@ -474,25 +474,23 @@ class subscribeToNewsletters(APIView):
                 print("The combination is present and the status is true.")
                 for item in list_subscriber:
                     if item['subscriberEmail'] == field['subscriberEmail'] and item['topic'] == field['topic'] and item["subscriberStatus"] == True:
-                        return Repsonse({"items":item,
-                            "document_id":item[document_id]
-                        })
-                        print("---item[subscriberEmail]---",item['subscriberEmail'])
-                        print("---item again---",item)
-                        field = {
-                            "_id": response["data]["_id"]
-                        }
-                        update_field = {
-                            "subscriberStatus": False
-                        }
-                        print("---The updation process started---")
-                        update_subscriber_data = dowellconnection(*subscriber_management,"update",field,update_field)
-                        print("---updated---")
-                        return Response({
-                            "success":True, 
-                            "message":f"Hi {subscriberEmail}, We are sorry you have unsubscribed from us, and we hope you will consider subscribing soon.",
-                            "Count": serializer.data["is_valid"]
-                        },status=status.HTTP_200_OK)
+                        return Response({"items":item,"document_id":item["document_id"]})
+                        # print("---item[subscriberEmail]---",item['subscriberEmail'])
+                        # print("---item again---",item)
+                        # field = {
+                        #     "_id": response["data]["_id"]
+                        # }
+                        # update_field = {
+                        #     "subscriberStatus": False
+                        # }
+                        # print("---The updation process started---")
+                        # update_subscriber_data = dowellconnection(*subscriber_management,"update",field,update_field)
+                        # print("---updated---")
+                        # return Response({
+                        #     "success":True, 
+                        #     "message":f"Hi {subscriberEmail}, We are sorry you have unsubscribed from us, and we hope you will consider subscribing soon.",
+                        #     "Count": serializer.data["is_valid"]
+                        # },status=status.HTTP_200_OK)
                     else:
                         return Response({
                             "success":False,   
