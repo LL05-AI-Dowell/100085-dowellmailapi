@@ -358,7 +358,7 @@ class subscribeToNewsletters(APIView):
                                 print("The combination is present and the status is true.")
                                 return Response({
                                     "success":True,
-                                    "message":f"User has already subscribed",
+                                    "message":f"Hi {subscriberEmail}, You have already subscribed to UX Living Lab newsletter",
                                     "Count": serializer.data["is_valid"]
                                 },status=status.HTTP_200_OK)
                             else:
