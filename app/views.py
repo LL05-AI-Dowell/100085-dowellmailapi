@@ -15,9 +15,10 @@ from database.database_management import *
 from mailapp.sendinblue import getHTMLContent as gTH
 from dotenv import load_dotenv
 
+
 # load_dotenv()
 load_dotenv("/home/100085/100085-dowellmailapi/.env")
-SECRET_KEY = str(os.getenv('SECRET_KEY')) 
+SECRET_KEY = str(os.getenv('SECRET_KEY'))
 @method_decorator(csrf_exempt, name='dispatch')
 class generateKey(APIView):
     def post(self, request):
@@ -32,7 +33,7 @@ class generateKey(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+
     def put(self, request):
         try:
             api_key = ApiKey.objects.all()
@@ -42,9 +43,9 @@ class generateKey(APIView):
             if not i.is_paid:
                 i.is_valid = 25
                 i.save()
-        
+
         return Response("API valid count updated successfully.", status=status.HTTP_200_OK)
-    
+
     def get(self, request):
         username = request.GET.get('user')
         print(username)
@@ -77,7 +78,7 @@ class sendmail(APIView):
             print("---Got apiKey---",api_key)
         except ApiKey.DoesNotExist:
             return Response("API Key not found.", status=status.HTTP_404_NOT_FOUND)
-        
+
         api_key.is_valid -= 1
         api_key.save()
 
@@ -86,19 +87,19 @@ class sendmail(APIView):
             if email_validation['status'] == "valid":
                 return Response({
                     "success": True,
-                    "message": f"Hurray ! {email} is a valid email"  
+                    "message": f"Hurray ! {email} is a valid email"
                 },status=status.HTTP_200_OK)
             else:
                 return Response({
                     "success": False,
-                    "message": f"Sorry ! {email} is not a valid email"  
+                    "message": f"Sorry ! {email} is not a valid email"
                 },status=status.HTTP_401_UNAUTHORIZED)
         else:
             return Response({
                 "success": False,
                 "message": "Limit exceeded"
             }, status=status.HTTP_423_LOCKED)
-        
+
     def send_email(self, request ,uuid):
         topic = "EditorMailComponent"
         toemail = request.data.get('email')
@@ -108,37 +109,37 @@ class sendmail(APIView):
         subject = request.data.get('subject')
         email_body = request.data.get('body')
         print("---Got the required parameters to send mail---", topic,toemail, toname, fromemail,subject, email_body)
-        
+
         field = {
             "topic": topic
         }
         update_field = {
             "status": "not_found"
         }
-        
+
         fetched_data = dowellconnection(*Email_management, "find", field, update_field)
         data = json.loads(fetched_data)
-        
+
         sender = fromName
         subject = subject
         templateName = data['data']['templateName']
         key = data['data']['key']
         message = data['data']['template_data'][0]['htmlContent']
         htmlTemplateContent = gTH.getTemplateHTMLContent(key, templateName)[0]['htmlContent']
-        
+
         print("---Got the template's htmlContent---")
-        
+
         emailBody = htmlTemplateContent.format(toname, email_body)
-        
+
         try:
             api_key = ApiKey.objects.get(uuid=uuid)
             print("---Got apiKey---",api_key)
         except ApiKey.DoesNotExist:
             return Response("API Key not found.", status=status.HTTP_404_NOT_FOUND)
-        
+
         api_key.is_valid -= 1
         api_key.save()
-        
+
         serializer = ApiKeySerializer(api_key)
         if api_key.is_valid >= 0:
             email_validation = validateMail(SECRET_KEY,toemail)
@@ -164,7 +165,7 @@ class sendmail(APIView):
             else:
                 return Response({
                 "success": False,
-                "message": f"Sorry ! {toemail} is not a valid email"  
+                "message": f"Sorry ! {toemail} is not a valid email"
             },status=status.HTTP_401_UNAUTHORIZED)
         else:
             return Response({
@@ -181,7 +182,7 @@ class sendmail(APIView):
             print("---Got apiKey---",api_key)
         except ApiKey.DoesNotExist:
             return Response("API Key not found.", status=status.HTTP_404_NOT_FOUND)
-        
+
         api_key.is_valid -= 1
         api_key.save()
         if api_key.is_valid >= 0:
@@ -209,7 +210,7 @@ class sendmail(APIView):
             "success": False,
             "message": "Invalid request type"
         }, status=status.HTTP_400_BAD_REQUEST)
-    
+
 @method_decorator(csrf_exempt, name='dispatch')
 class test_api_key(APIView):
     def post(self, request):
@@ -248,7 +249,7 @@ class test_api_key(APIView):
                 "status" :False,
                 "message" : f"{username} is not authorized"
             })
-        
+
 @method_decorator(csrf_exempt, name='dispatch')
 class subscribeToNewsletters(APIView):
     def get(self,request,uuid):
@@ -269,7 +270,7 @@ class subscribeToNewsletters(APIView):
             "message": "List of subscriber",
             "Details": json.loads(fetch_data)
         },status=status.HTTP_200_OK)
-        
+
     def post(self,request,uuid):
         topic = request.data.get("topic")
         subscriberEmail = request.data.get("subscriberEmail")
@@ -323,7 +324,7 @@ class subscribeToNewsletters(APIView):
                         }
                         insert_subscriber_data = dowellconnection(*subscriber_management,"insert",field,update_field)
                         print("---inserting data to database---")
-                        
+
                         return Response({
                             "success": True,
                             "message": f"Hi {subscriberEmail} , Thank you for subscribing to UX Living Lab newsletter",
@@ -373,16 +374,17 @@ class subscribeToNewsletters(APIView):
                                         }
                                         print("---The updation process started---")
                                         update_subscriber_data = dowellconnection(*subscriber_management,"update",field,update_field)
+
                                         return Response({
-                                            "success":True, 
+                                            "success":True,
                                             "message":f"Hi {subscriberEmail} , Thank you for resubscribing to UX Living Lab newsletter",
                                             "Count": serializer.data["is_valid"]
                                         },status=status.HTTP_200_OK)
-                                    else:
-                                        return Response({
-                                            "success":False,
-                                            "message": "Something went wrong while updating subscriber"
-                                        },status=status.HTTP_200_OK)          
+                                    # else:
+                                    #     return Response({
+                                    #         "success":False,
+                                    #         "message": "Something went wrong while updating subscriber"
+                                    #     },status=status.HTTP_200_OK)
                         else:
                             print("The user is not subscribed to particular combination , starting the subscription process")
                             field = {
@@ -400,7 +402,7 @@ class subscribeToNewsletters(APIView):
                             }
                             insert_subscriber_data = dowellconnection(*subscriber_management,"insert",field,update_field)
                             print("---inserting data to database---")
-                            
+
                             return Response({
                                 "success": True,
                                 "message": f"Hi {subscriberEmail}, Thank you for subscribing to UX Living Lab newsletter",
@@ -413,13 +415,13 @@ class subscribeToNewsletters(APIView):
                         "success": False,
                         "message": f"{subscriberEmail} is not a valid email",
                         "Count": serializer.data["is_valid"]
-                    },status=status.HTTP_200_OK)   
+                    },status=status.HTTP_200_OK)
             else:
                 return Response({
                 "success": False,
                 "message": "Limit exceeded"
             }, status=status.HTTP_423_LOCKED)
-               
+
     def put(self,request,uuid):
         try:
             api_key = ApiKey.objects.get(uuid=uuid)
