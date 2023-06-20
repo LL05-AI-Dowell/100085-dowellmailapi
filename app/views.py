@@ -326,7 +326,7 @@ class subscribeToNewsletters(APIView):
                         
                         return Response({
                             "success": True,
-                            "message": "Thank you for subscribing to our newsletter !",
+                            "message": f"Hi {subscriberEmail} , Thank you for subscribing to UX Living Lab newsletter",
                             "Details": field,
                             "DATABASE INFO":json.loads(insert_subscriber_data),
                             "Count": serializer.data["is_valid"]
@@ -375,7 +375,7 @@ class subscribeToNewsletters(APIView):
                                         update_subscriber_data = dowellconnection(*subscriber_management,"update",field,update_field)
                                         return Response({
                                             "status":True, 
-                                            "message":"Thank you resubscribing to the newsletter",
+                                            "message":f"Hi {subscriberEmail} , Thank you for resubscribing to UX Living Lab newsletter",
                                             "Count": serializer.data["is_valid"]
                                         },status=status.HTTP_208_ALREADY_REPORTED)
                                     else:
@@ -403,7 +403,7 @@ class subscribeToNewsletters(APIView):
                             
                             return Response({
                                 "success": True,
-                                "message": "Thank you for subscribing to our newsletter !",
+                                "message": f"Hi {subscriberEmail}, Thank you for subscribing to UX Living Lab newsletter",
                                 "Details": field,
                                 "DATABASE INFO":json.loads(insert_subscriber_data),
                                 "Count": serializer.data["is_valid"]
