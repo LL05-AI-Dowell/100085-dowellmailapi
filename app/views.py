@@ -442,7 +442,7 @@ class subscribeToNewsletters(APIView):
         print("---Fetching data based on apiKey---")
         fetch_all_subscriber = dowellconnection(*subscriber_management,"fetch",field,update_field)
         response = json.loads(fetch_all_subscriber)
-        # return Response(response)
+        print("here is responce",response)
         list_subscriber = []
         for item in response['data']:
             listOfSubscriber = {
@@ -458,17 +458,19 @@ class subscribeToNewsletters(APIView):
             "subscriberStatus":True,
             "topic":topic
         }
+        print("---checking combination---")
         combination_present = False
         subscribed = False
-
+        print("---subscriber status---",subscribed)
         for item in response["data"]:
             if (item["subscriberEmail"] == field["subscriberEmail"] and item["topic"] == "Internal updates weekly" and item["subscriberStatus"] == True):
                 combination_present = True
                 subscribed = item["subscriberStatus"]
+                print("items are", item)
                 break
         if combination_present:
             if subscribed:
-                print("The combination is present and the status is true.")
+                print("The combination is present and the status is true.", response)
                 for item in list_subscriber:
                     if item['subscriberEmail'] == field['subscriberEmail'] and item['topic'] == field['topic']:
                         field = {
@@ -487,10 +489,10 @@ class subscribeToNewsletters(APIView):
                         },status=status.HTTP_200_OK)
                     else:
                         return Response({
-                            "success":False,  
+                            "success":False,   
                             "message":"Something went wrong",
                             "Count": serializer.data["is_valid"]
-                        },status=status.HTTP_200_OK)
+                        },status=status.HTTP_404_NOT_FOUND)
                 else:
                     return Response({
                         "success":True, 
