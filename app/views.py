@@ -458,56 +458,33 @@ class subscribeToNewsletters(APIView):
             "subscriberStatus":True,
             "topic":topic
         }
-        print("---checking combination---")
-        combination_present = False
-        subscribed = False
-        print("---subscriber status---",subscribed)
+        
         for item in response["data"]:
-            if (item["subscriberEmail"] == field["subscriberEmail"] and item["topic"] == field["topic"] and item["subscriberStatus"] == True):
-                combination_present = True
+            if (item["subscriberEmail"] == field["subscriberEmail"] and item["topic"] == field["topic"] and item["subscriberStatus"] == field["subscriberStatus"]):
                 subscribed = item["subscriberStatus"]
                 print("---no subscribed status---", subscribed)
-                print("items are", item)
-                break
-        if combination_present:
-            if subscribed:
-                print("The combination is present and the status is true.")
-                for item in list_subscriber:
-                    return Response(item)
-                    if item['subscriberEmail'] == field['subscriberEmail'] and item['topic'] == field['topic'] and item["subscriberStatus"] == True:
-                        return Response({"items":item,"document_id":item["document_id"]})
-                        # print("---item[subscriberEmail]---",item['subscriberEmail'])
-                        # print("---item again---",item)
-                        # field = {
-                        #     "_id": response["data]["_id"]
-                        # }
-                        # update_field = {
-                        #     "subscriberStatus": False
-                        # }
-                        # print("---The updation process started---")
-                        # update_subscriber_data = dowellconnection(*subscriber_management,"update",field,update_field)
-                        # print("---updated---")
-                        # return Response({
-                        #     "success":True, 
-                        #     "message":f"Hi {subscriberEmail}, We are sorry you have unsubscribed from us, and we hope you will consider subscribing soon.",
-                        #     "Count": serializer.data["is_valid"]
-                        # },status=status.HTTP_200_OK)
-                    else:
-                        return Response({
-                            "success":False,   
-                            "message":"Something went wrong",
-                            "Count": serializer.data["is_valid"]
-                        },status=status.HTTP_404_NOT_FOUND)
+                if subscribed :
+                    field = {
+                        "_id": item["_id"]
+                    }
+                    update_field = {
+                        "subscriberStatus": False
+                    }
+                    print("---The updation process started---")
+                    update_subscriber_data = dowellconnection(*subscriber_management,"update",field,update_field)
+                    print("---updated---")
+                    return({
+                        "success": True,
+                        "message": f"Hi {subscriberEmail}, We are sorry you have unsubscribed from us, and we hope you will consider subscribing soon."
+                    })
+                else:
+                    return Response({
+                        "success": True,
+                        "message":f"Hi {subscriberEmail} , you have already unsubscribed."
+                    })
             else:
                 return Response({
-                    "success":True, 
-                    "message":"Hi {subscriberEmail}, Please consider subscribing to UX Living Lab newsletter",
-                },status=status.HTTP_200_OK)
-        else:
-            print("The combination is present but the status is false.")
-            return Response({
-                "success":True, 
-                "message":f"{subscriberEmail}, already unsubscribed to UX Living Lab newsletter",
-            })
-
-          
+                    "success": False,
+                    "message":"Please consider subscribing UX Livinglab newsletter."
+                })
+        
