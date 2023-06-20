@@ -15,8 +15,8 @@ from database.database_management import *
 from mailapp.sendinblue import getHTMLContent as gTH
 from dotenv import load_dotenv
 
-# load_dotenv()
-load_dotenv("/home/100085/100085-dowellmailapi/.env")
+load_dotenv()
+# load_dotenv("/home/100085/100085-dowellmailapi/.env")
 SECRET_KEY = str(os.getenv('SECRET_KEY')) 
 @method_decorator(csrf_exempt, name='dispatch')
 class generateKey(APIView):
@@ -374,13 +374,13 @@ class subscribeToNewsletters(APIView):
                                         print("---The updation process started---")
                                         update_subscriber_data = dowellconnection(*subscriber_management,"update",field,update_field)
                                         return Response({
-                                            "status":True, 
+                                            "success":True, 
                                             "message":f"Hi {subscriberEmail} , Thank you for resubscribing to UX Living Lab newsletter",
                                             "Count": serializer.data["is_valid"]
                                         },status=status.HTTP_200_OK)
                                     else:
                                         return Response({
-                                            "status":False,
+                                            "success":False,
                                             "message": "Something went wrong while updating subscriber"
                                         },status=status.HTTP_200_OK)          
                         else:
@@ -430,36 +430,76 @@ class subscribeToNewsletters(APIView):
         api_key.is_valid -= 1
         api_key.save()
         serializer = ApiKeySerializer(api_key)
-        topic = request.data.get("topic")
-        subscriberEmail = request.data.get("subscriberEmail")
+        topic = request.data.get('topic')
+        subscriberEmail = request.data.get('subscriberEmail')
         field = {
-            "topic":topic,
-            "subscriberEmail":subscriberEmail
+            "APIKey": uuid
         }
-        update_field={
-            "status":"ok"
+        update_field = {
+            "status": "OK",
         }
-        print("---Fetching data from database based on required data---")
-        fetched_data = dowellconnection(*subscriber_management,"find",field,update_field)
-        data = json.loads(fetched_data)
-        print("---Data has been found and checking if the provided email has subscribed to the topic of not ---")
-        if (data['data']['subscriberStatus'] == True):
-            field= {
-                "_id":data['data']['_id']
+
+        print("---Fetching data based on apiKey---")
+        fetch_all_subscriber = dowellconnection(*subscriber_management,"fetch",field,update_field)
+        response = json.loads(fetch_all_subscriber)
+        # return Response(response)
+        list_subscriber = []
+        for item in response['data']:
+            listOfSubscriber = {
+                'document_id': item['_id'],
+                'subscriberEmail': item['subscriberEmail'],
+                'typeOfSubscriber': item['typeOfSubscriber'],
+                'subscriberStatus': item['subscriberStatus'],
+                'topic': item['topic']
             }
-            update_field = {
-                "subscriberStatus": False
-            }
-            print("---Provided email was subscribed to the topic and Unsubscribing---")
-            update_response = dowellconnection(*subscriber_management,"update",field,update_field)
-            print("---Unsubscribed ! SAD---")
-            return Response({
-                "success": True,
-                "message":"We are sorry you have unsubscribed from us, and we hope you will consider subscribing soon." , 
-                "Subscriber Email Address": subscriberEmail
-            },status=status.HTTP_200_OK)
+            list_subscriber.append(listOfSubscriber)
+        field = {
+            "subscriberEmail":subscriberEmail,
+            "subscriberStatus":True,
+            "topic":topic
+        }
+        combination_present = False
+        subscribed = False
+
+        for item in response["data"]:
+            if (item["subscriberEmail"] == field["subscriberEmail"] and item["topic"] == "Internal updates weekly" and item["subscriberStatus"] == True):
+                combination_present = True
+                subscribed = item["subscriberStatus"]
+                break
+        if combination_present:
+            if subscribed:
+                print("The combination is present and the status is true.")
+                for item in list_subscriber:
+                    if item['subscriberEmail'] == field['subscriberEmail'] and item['topic'] == field['topic']:
+                        field = {
+                            "_id": item['document_id']
+                        }
+                        update_field = {
+                            "subscriberStatus": False
+                        }
+                        print("---The updation process started---")
+                        update_subscriber_data = dowellconnection(*subscriber_management,"update",field,update_field)
+                        return Response({
+                            "success":True, 
+                            "message":f"Hi {subscriberEmail}, We are sorry you have unsubscribed from us, and we hope you will consider subscribing soon.",
+                            "Count": serializer.data["is_valid"]
+                        },status=status.HTTP_200_OK)
+                    else:
+                        return Response({
+                            "success":False,  
+                            "message":"Something went wrong",
+                            "Count": serializer.data["is_valid"]
+                        },status=status.HTTP_200_OK)
+                else:
+                    return Response({
+                        "success":True, 
+                        "message":"Hi {subscriberEmail}, Please consider subscribing to UX Living Lab newsletter",
+                    },status=status.HTTP_200_OK)
         else:
+            print("The combination is present but the status is false.")
             return Response({
-                "success": False,
-                "message":"Already an unsubscribed!"
-            },status=status.HTTP_200_OK)
+                "success":True, 
+                "message":f"{subscriberEmail}, already unsubscribed to UX Living Lab newsletter",
+            })
+
+          
