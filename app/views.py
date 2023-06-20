@@ -432,6 +432,7 @@ class subscribeToNewsletters(APIView):
         serializer = ApiKeySerializer(api_key)
         topic = request.data.get('topic')
         subscriberEmail = request.data.get('subscriberEmail')
+        typeOfSubscriber = request.data.get('typeOfSubscriber')
         field = {
             "APIKey": uuid
         }
@@ -442,49 +443,41 @@ class subscribeToNewsletters(APIView):
         print("---Fetching data based on apiKey---")
         fetch_all_subscriber = dowellconnection(*subscriber_management,"fetch",field,update_field)
         response = json.loads(fetch_all_subscriber)
-        print("here is responce",response)
-        list_subscriber = []
-        for item in response['data']:
-            listOfSubscriber = {
-                'document_id': item['_id'],
-                'subscriberEmail': item['subscriberEmail'],
-                'typeOfSubscriber': item['typeOfSubscriber'],
-                'subscriberStatus': item['subscriberStatus'],
-                'topic': item['topic']
-            }
-            list_subscriber.append(listOfSubscriber)
+
         field = {
-            "subscriberEmail":subscriberEmail,
-            "subscriberStatus":True,
-            "topic":topic
+            "subscriberEmail": subscriberEmail ,
+            "subscriberStatus": True,
+            "topic": topic,
+            "typeOfSubscriber": typeOfSubscriber
         }
-        
-        for item in response["data"]:
-            if (item["subscriberEmail"] == field["subscriberEmail"] and item["topic"] == field["topic"] and item["subscriberStatus"] == field["subscriberStatus"]):
-                subscribed = item["subscriberStatus"]
-                print("---no subscribed status---", subscribed)
-                if subscribed :
-                    field = {
-                        "_id": item["_id"]
-                    }
-                    update_field = {
-                        "subscriberStatus": False
-                    }
-                    print("---The updation process started---")
-                    update_subscriber_data = dowellconnection(*subscriber_management,"update",field,update_field)
-                    print("---updated---")
-                    return Response({
-                        "success": True,
-                        "message": f"Hi {subscriberEmail}, We are sorry you have unsubscribed from us, and we hope you will consider subscribing soon."
-                    })
-                else:
-                    return Response({
-                        "success": True,
-                        "message":f"Hi {subscriberEmail} , you have already unsubscribed."
-                    })
-            else:
-                return Response({
-                    "success": False,
-                    "message":"Please consider subscribing UX Livinglab newsletter."
-                })
-        
+
+        found_combination = None
+
+        for item in response['data']:
+            if all(item[key] == field[key] for key in field):
+                found_combination = item
+                break
+        if found_combination:
+            data = {
+                "document_id": found_combination["_id"],
+                "subscriberEmail": found_combination["subscriberEmail"],
+                "subscriberStatus": found_combination["subscriberStatus"],
+                "topic": found_combination["topic"],
+                "typeOfSubscriber": found_combination["typeOfSubscriber"]
+            }
+            field = {
+                "_id":data["document_id"]
+            }
+            update_field = {
+                "subscriberStatus": False
+            }
+            update_subscriber_status = dowellconnection(*subscriber_management,"update",field,update_field)
+            return Response({
+                "success": True,
+                "message":f"Hi {subscriberEmail}, We are sorry you have unsubscribed from us, and we hope you will consider subscribing soon."
+                }, status=status.HTTP_200_OK)
+        else:
+            return Response({
+                "success": True,
+                "message":f"Hi {subscriberEmail}, you have already unsubscribed."
+                }, status=status.HTTP_200_OK)
