@@ -382,7 +382,7 @@ class subscribeToNewsletters(APIView):
                                         return Response({
                                             "status":False,
                                             "message": "Something went wrong while updating subscriber"
-                                        },status=status.HTTP_400_BAD_REQUEST)          
+                                        },status=status.HTTP_200_OK)          
                         else:
                             print("The user is not subscribed to particular combination , starting the subscription process")
                             field = {
@@ -457,9 +457,9 @@ class subscribeToNewsletters(APIView):
                 "success": True,
                 "message":"We are sorry you have unsubscribed from us, and we hope you will consider subscribing soon." , 
                 "Subscriber Email Address": subscriberEmail
-            },status=status.HTTP_202_ACCEPTED)
+            },status=status.HTTP_200_OK)
         else:
             return Response({
                 "success": False,
                 "message":"Already an unsubscribed!"
-            },status=status.HTTP_406_NOT_ACCEPTABLE)
+            },status=status.HTTP_200_OK)
