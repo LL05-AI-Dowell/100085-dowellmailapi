@@ -473,6 +473,7 @@ class subscribeToNewsletters(APIView):
             if subscribed:
                 print("The combination is present and the status is true.")
                 for item in list_subscriber:
+                    return Response(item)
                     if item['subscriberEmail'] == field['subscriberEmail'] and item['topic'] == field['topic'] and item["subscriberStatus"] == True:
                         return Response({"items":item,"document_id":item["document_id"]})
                         # print("---item[subscriberEmail]---",item['subscriberEmail'])
@@ -497,11 +498,11 @@ class subscribeToNewsletters(APIView):
                             "message":"Something went wrong",
                             "Count": serializer.data["is_valid"]
                         },status=status.HTTP_404_NOT_FOUND)
-                else:
-                    return Response({
-                        "success":True, 
-                        "message":"Hi {subscriberEmail}, Please consider subscribing to UX Living Lab newsletter",
-                    },status=status.HTTP_200_OK)
+            else:
+                return Response({
+                    "success":True, 
+                    "message":"Hi {subscriberEmail}, Please consider subscribing to UX Living Lab newsletter",
+                },status=status.HTTP_200_OK)
         else:
             print("The combination is present but the status is false.")
             return Response({
