@@ -377,7 +377,7 @@ class subscribeToNewsletters(APIView):
                                             "status":True, 
                                             "message":f"Hi {subscriberEmail} , Thank you for resubscribing to UX Living Lab newsletter",
                                             "Count": serializer.data["is_valid"]
-                                        },status=status.HTTP_208_ALREADY_REPORTED)
+                                        },status=status.HTTP_200_OK)
                                     else:
                                         return Response({
                                             "status":False,
