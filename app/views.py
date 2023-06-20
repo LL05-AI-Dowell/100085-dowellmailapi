@@ -479,6 +479,7 @@ class subscribeToNewsletters(APIView):
                         }
                         print("---The updation process started---")
                         update_subscriber_data = dowellconnection(*subscriber_management,"update",field,update_field)
+                        print("---updated---")
                         return Response({
                             "success":True, 
                             "message":f"Hi {subscriberEmail}, We are sorry you have unsubscribed from us, and we hope you will consider subscribing soon.",
