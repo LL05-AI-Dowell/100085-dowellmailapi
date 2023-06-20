@@ -474,7 +474,9 @@ class subscribeToNewsletters(APIView):
                 print("The combination is present and the status is true.")
                 for item in list_subscriber:
                     if item['subscriberEmail'] == field['subscriberEmail'] and item['topic'] == field['topic'] and item["subscriberStatus"] == True:
-                        return Repsonse({"items:item,"id":item[document_id]})
+                        return Repsonse({"items":item,
+                            "document_id":item[document_id]
+                        })
                         print("---item[subscriberEmail]---",item['subscriberEmail'])
                         print("---item again---",item)
                         field = {
