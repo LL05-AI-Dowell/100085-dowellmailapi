@@ -466,13 +466,16 @@ class subscribeToNewsletters(APIView):
             if (item["subscriberEmail"] == field["subscriberEmail"] and item["topic"] == "Internal updates weekly" and item["subscriberStatus"] == True):
                 combination_present = True
                 subscribed = item["subscriberStatus"]
+                print("---no subscribed status---", subscribed)
                 print("items are", item)
                 break
         if combination_present:
             if subscribed:
-                print("The combination is present and the status is true.", response)
+                print("The combination is present and the status is true.")
                 for item in list_subscriber:
                     if item['subscriberEmail'] == field['subscriberEmail'] and item['topic'] == field['topic']:
+                        print("---item[subscriberEmail]---",item['subscriberEmail'])
+                        print("---item again---",item)
                         field = {
                             "_id": item['document_id']
                         }
