@@ -700,7 +700,10 @@ class sendAPIkey(APIView):
             api_response = api_instance.send_transac_email(send_smtp_email)
             api_response_dict = api_response.to_dict()
             print("---The email has been sent successfully!---")
-            return True
+            return Response({
+                "success": True,
+                "message": "Mail sent successfully"
+            })
         except ApiException as e:
-            print("---Failed to send the email: {}---".format(str(e)))
-            return False
+            print("---Failed to send the email---")
+            return Response({"error":"Exception when calling SMTPApi->send_transac_email: %s\n" % e},status=status.HTTP_400_BAD_REQUEST)
