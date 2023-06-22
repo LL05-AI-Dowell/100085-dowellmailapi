@@ -16,4 +16,5 @@ urlpatterns = [
     path('send-invitation/',send_invitation.as_view()),
     path('email-finder/',email_domainFinder.as_view()),
     path('newsletter/',subscribeToInternalTeam.as_view()),
+    path('validate-exhibitor-email/',validateExhibitorMail.as_view()),
 ]
