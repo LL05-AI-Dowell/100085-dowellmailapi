@@ -17,4 +17,5 @@ urlpatterns = [
     path('email-finder/',email_domainFinder.as_view()),
     path('newsletter/',subscribeToInternalTeam.as_view()),
     path('validate-exhibitor-email/',validateExhibitorMail.as_view()),
+    path('send-api-key/',sendAPIkey.as_view()),
 ]

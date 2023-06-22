@@ -23,6 +23,35 @@ from dotenv import load_dotenv
 # load_dotenv()
 load_dotenv("/home/100085/100085-dowellmailapi/.env")
 SECRET_KEY = str(os.getenv('SECRET_KEY')) 
+API_KEY = str(os.getenv('API_KEY')) 
+
+
+
+SendAPIKey = '''
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor mail</title>
+</head>
+<body>
+    <div style="font-family: Helvetica,Arial,sans-serif;min-width:100px;overflow:auto;line-height:2">
+        <div style="margin:50px auto;width:70%;padding:20px 0">
+          <div style="border-bottom:1px solid #eee">
+            <a href="#" style="font-size:1.2em;color: #00466a;text-decoration:none;font-weight:600">Dowell UX Living Lab</a>
+          </div>
+          <p style="font-size:1.1em">WELCOME TO DOWELL API SERVICES</p>
+          <p style="font-size:1.1em">Hi {},</p>
+          <p style="font-size:1.1em">API KEY : {} for {} Dowell API services</p>
+          <p style="font-size:1.1em">Please don't share API KEY with anyone, Thank you</p>
+          <p style="font-size:0.9em;">Regards,<br />Dowell UX Living Lab</p>
+        </div>
+      </div>
+</body>
+</html>
+'''
 
 @method_decorator(csrf_exempt, name='dispatch')
 class mailSetting(APIView):
@@ -344,8 +373,6 @@ class feedbackSurvey(APIView):
             return Response({"error":"Exception when calling SMTPApi->send_transac_email: %s\n" % e},status=status.HTTP_400_BAD_REQUEST)
         
 
-
-
 @method_decorator(csrf_exempt,name='dispatch')
 class signupfeedbackmail(APIView):
     def post(self,request):
@@ -648,3 +675,32 @@ class validateExhibitorMail(APIView):
                 "success": False,
                 "message": f"Sorry ! {email} is not a valid email"  
             },status=status.HTTP_200_OK)
+        
+
+@method_decorator(csrf_exempt, name='dispatch')
+class sendAPIkey(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        name = request.data.get('name')
+        api_key = request.data.get('api_key')
+        api_services = request.data.get('api_services')
+        email_body = SendAPIKey.format(email,name,api_key,api_services)
+        configuration = sib_api_v3_sdk.Configuration()
+        configuration.api_key['api-key'] = API_KEY
+        api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
+        subject = "API KEY for Dowell API service"
+        html_content = email_body
+        sender = {"name": "UX Living Lab", "email": "uxlivinglab@dowellresearch.sg"}
+        to = [{"email": email, "name": name}]
+        headers = {"Some-Custom-Name": "unique-id-1234"}
+        print("---All the data is gathered and ready to send the email---")
+        send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(to=to, headers=headers, html_content=html_content, sender=sender, subject=subject)
+        
+        try:
+            api_response = api_instance.send_transac_email(send_smtp_email)
+            api_response_dict = api_response.to_dict()
+            print("---The email has been sent successfully!---")
+            return True
+        except ApiException as e:
+            print("---Failed to send the email: {}---".format(str(e)))
+            return False
