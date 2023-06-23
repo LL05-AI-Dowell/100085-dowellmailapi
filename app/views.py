@@ -14,6 +14,7 @@ from .serializers import *
 from database.database_management import *
 from mailapp.sendinblue import getHTMLContent as gTH
 from dotenv import load_dotenv
+import csv
 
 
 # load_dotenv()
@@ -435,6 +436,91 @@ class subscribeToNewsletters(APIView):
         topic = request.data.get('topic')
         subscriberEmail = request.data.get('subscriberEmail')
         typeOfSubscriber = request.data.get('typeOfSubscriber')
+        field = {
+            "APIKey": uuid
+        }
+        update_field = {
+            "status": "OK",
+        }
+
+        print("---Fetching data based on apiKey---")
+        fetch_all_subscriber = dowellconnection(*subscriber_management,"fetch",field,update_field)
+        response = json.loads(fetch_all_subscriber)
+
+        field = {
+            "subscriberEmail": subscriberEmail ,
+            "subscriberStatus": True,
+            "topic": topic,
+            "typeOfSubscriber": typeOfSubscriber
+        }
+
+        found_combination = None
+
+        for item in response['data']:
+            if all(item[key] == field[key] for key in field):
+                found_combination = item
+                break
+        if found_combination:
+            data = {
+                "document_id": found_combination["_id"],
+                "subscriberEmail": found_combination["subscriberEmail"],
+                "subscriberStatus": found_combination["subscriberStatus"],
+                "topic": found_combination["topic"],
+                "typeOfSubscriber": found_combination["typeOfSubscriber"]
+            }
+            field = {
+                "_id":data["document_id"]
+            }
+            update_field = {
+                "subscriberStatus": False
+            }
+            update_subscriber_status = dowellconnection(*subscriber_management,"update",field,update_field)
+            return Response({
+                "success": True,
+                "message":f"Hi {subscriberEmail}, We are sorry you have unsubscribed from us, and we hope you will consider subscribing soon."
+                }, status=status.HTTP_200_OK)
+        else:
+            return Response({
+                "success": True,
+                "message":f"Hi {subscriberEmail}, you have already unsubscribed."
+                }, status=status.HTTP_200_OK)
+        
+
+@method_decorator(csrf_exempt, name='dispatch')
+class sendNewsLetterToInternalTeam(APIView):
+    def post(self, request):
+        field = {
+            "APIKey":"e4f8bbdf-d998-4b3a-bc21-e99ab8267c86"
+        }
+        update_field = {
+            "status":"ok"
+        }
+        response = dowellconnection(*subscriber_management,"fetch",field,update_field)
+        data = json.loads(response)
+        filtered_data = [entry["subscriberEmail"] for entry in data["data"] if entry["subscriberStatus"]]
+        with open("subscribers.csv", "w", newline="") as csv_file:
+            writer = csv.writer(csv_file)
+            writer.writerow(["Email"])  
+            for email in filtered_data:
+                writer.writerow([email])
+        return Response("Done")
+    
+
+@method_decorator(csrf_exempt, name= 'dispatch')
+class unsubscribeToNewsletter(APIView):
+    def get(self, request,uuid,topic,typeOfSubscriber,subscriberEmail):
+        try:
+            api_key = ApiKey.objects.get(uuid=uuid)
+            print("---Got apiKey---",api_key)
+        except ApiKey.DoesNotExist:
+            return Response("API Key not found.", status=status.HTTP_404_NOT_FOUND)
+        print("---Decrementing API key count---")
+        api_key.is_valid -= 1
+        api_key.save()
+        serializer = ApiKeySerializer(api_key)
+        topic = topic
+        subscriberEmail = subscriberEmail
+        typeOfSubscriber = typeOfSubscriber
         field = {
             "APIKey": uuid
         }
