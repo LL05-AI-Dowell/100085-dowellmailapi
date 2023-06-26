@@ -17,8 +17,8 @@ from dotenv import load_dotenv
 import csv
 
 
-# load_dotenv()
-load_dotenv("/home/100085/100085-dowellmailapi/.env")
+load_dotenv()
+# load_dotenv("/home/100085/100085-dowellmailapi/.env")
 SECRET_KEY = str(os.getenv('SECRET_KEY'))
 @method_decorator(csrf_exempt, name='dispatch')
 class generateKey(APIView):
@@ -61,47 +61,52 @@ class generateKey(APIView):
 class sendmail(APIView):
     def post(self, request, uuid):
         type_request = request.GET.get('type')
+        api_services = request.GET.get('service')
 
         if type_request == "validate":
-            return self.validate_email(request,uuid)
+            return self.validate_email(request,uuid,api_services)
         elif type_request == 'send-email':
-            return self.send_email(request,uuid)
+            return self.send_email(request,uuid,api_services)
         elif type_request == 'email-finder':
-            return self.email_finder(request,uuid)
+            return self.email_finder(request,uuid,api_services)
         else:
             return self.handle_error(request)
 
-    def validate_email(self, request,uuid):
+    def validate_email(self, request,uuid,api_services):
         email = request.data.get('email')
         print("---Got the required parameter to send mail---",email)
-        try:
-            api_key = ApiKey.objects.get(uuid=uuid)
-            print("---Got apiKey---",api_key)
-        except ApiKey.DoesNotExist:
-            return Response("API Key not found.", status=status.HTTP_404_NOT_FOUND)
-
-        api_key.is_valid -= 1
-        api_key.save()
-
-        email_validation = validateMail(SECRET_KEY,email)
-        if api_key.is_valid >= 0:
-            if email_validation['status'] == "valid":
-                return Response({
-                    "success": True,
-                    "message": f"Hurray ! {email} is a valid email"
-                },status=status.HTTP_200_OK)
-            else:
-                return Response({
-                    "success": False,
-                    "message": f"Sorry ! {email} is not a valid email"
-                },status=status.HTTP_401_UNAUTHORIZED)
+        
+        validate_api_count = processApikey(uuid,api_services)
+        data_count = json.loads(validate_api_count)
+        print("---data_count---",data_count)
+        if data_count['success'] :
+            if data_count['count'] >= 0 :
+                print("---Data count is ok---")
+                email_validation = validateMail(SECRET_KEY,email)
+                if email_validation['status'] == "valid":
+                    return Response({
+                        "success": True,
+                        "message": f"Hurray ! {email} is a valid email",
+                        "credits": data_count['count']
+                    },status=status.HTTP_200_OK)
+                else:
+                    return Response({
+                        "success": False,
+                        "message": f"Sorry ! {email} is not a valid email",
+                        "creits": data_count['count']
+                    },status=status.HTTP_200_OK)
+            return Response({
+                "success": False,
+                "message": data_count['message'],
+                "credits": data_count['count']
+            }, status=status.HTTP_200_OK)
         else:
             return Response({
                 "success": False,
-                "message": "Limit exceeded"
-            }, status=status.HTTP_423_LOCKED)
+                "message": data_count['message']
+            }, status=status.HTTP_400_BAD_REQUEST)
 
-    def send_email(self, request ,uuid):
+    def send_email(self, request ,uuid,api_services):
         topic = "EditorMailComponent"
         toemail = request.data.get('email')
         toname = request.data.get('name')
@@ -132,79 +137,89 @@ class sendmail(APIView):
 
         emailBody = htmlTemplateContent.format(toname, email_body)
 
-        try:
-            api_key = ApiKey.objects.get(uuid=uuid)
-            print("---Got apiKey---",api_key)
-        except ApiKey.DoesNotExist:
-            return Response("API Key not found.", status=status.HTTP_404_NOT_FOUND)
-
-        api_key.is_valid -= 1
-        api_key.save()
-
-        serializer = ApiKeySerializer(api_key)
-        if api_key.is_valid >= 0:
-            email_validation = validateMail(SECRET_KEY,toemail)
-            print(email_validation)
-            if email_validation['status'] == "valid":
-                configuration = sib_api_v3_sdk.Configuration()
-                configuration.api_key['api-key'] = key
-                api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
-                subject = subject
-                html_content = emailBody
-                sender = {"name": sender, "email": fromemail}
-                to = [{"email": toemail, "name": toname}]
-                headers = {"Some-Custom-Name": "unique-id-1234"}
-                print("---All the data are gethered and ready to send mail---")
-                send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(to=to, headers=headers,html_content=html_content, sender=sender, subject=subject)
-                try:
-                    api_response = api_instance.send_transac_email(send_smtp_email)
-                    api_response_dict = api_response.to_dict()
-                    print("---The mail has been sent ! Happy :D---")
-                    return Response({"success": True,"message":"Mail has been sent!!","send status":json.dumps(api_response_dict),"is_valid_count":serializer.data["is_valid"]},status=status.HTTP_200_OK)
-                except ApiException as e:
-                    return Response({"error":"Exception when calling SMTPApi->send_transac_email: %s\n" % e},status=status.HTTP_400_BAD_REQUEST)
+        validate_api_count = processApikey(uuid,api_services)
+        data_count = json.loads(validate_api_count)
+        if data_count['success'] :
+            if data_count['count'] >= 0:
+                print("---Data count is ok---")
+                email_validation = validateMail(SECRET_KEY,toemail)
+                print(email_validation)
+                if email_validation['status'] == "valid":
+                    configuration = sib_api_v3_sdk.Configuration()
+                    configuration.api_key['api-key'] = key
+                    api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
+                    subject = subject
+                    html_content = emailBody
+                    sender = {"name": sender, "email": fromemail}
+                    to = [{"email": toemail, "name": toname}]
+                    headers = {"Some-Custom-Name": "unique-id-1234"}
+                    print("---All the data are gethered and ready to send mail---")
+                    send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(to=to, headers=headers,html_content=html_content, sender=sender, subject=subject)
+                    try:
+                        api_response = api_instance.send_transac_email(send_smtp_email)
+                        api_response_dict = api_response.to_dict()
+                        print("---The mail has been sent ! Happy :D---")
+                        return Response({
+                            "success": True,
+                            "message":"Mail has been sent!!",
+                            "send status":json.dumps(api_response_dict),
+                            "credits": data_count['count']
+                        },status=status.HTTP_200_OK)
+                    except ApiException as e:
+                        return Response({"error":"Exception when calling SMTPApi->send_transac_email: %s\n" % e},status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    return Response({
+                    "success": False,
+                    "message": f"Sorry ! {toemail} is not a valid email",
+                    "credits": data_count['count']
+                },status=status.HTTP_200_OK)
             else:
                 return Response({
                 "success": False,
-                "message": f"Sorry ! {toemail} is not a valid email"
-            },status=status.HTTP_401_UNAUTHORIZED)
+                "message": data_count['message'],
+                "credits": data_count['count']
+                },status=status.HTTP_200_OK)
         else:
             return Response({
                 "success": False,
-                "message": "Limit exceeded"
-            }, status=status.HTTP_423_LOCKED)
+                "message": data_count['message']
+            }, status=status.HTTP_400_BAD_REQUEST)
 
-    def email_finder(self,request,uuid):
+    def email_finder(self,request,uuid,api_services):
         name = request.data.get('name')
         domain = request.data.get('domain')
         print(name, domain,uuid)
-        try:
-            api_key = ApiKey.objects.get(uuid=uuid)
-            print("---Got apiKey---",api_key)
-        except ApiKey.DoesNotExist:
-            return Response("API Key not found.", status=status.HTTP_404_NOT_FOUND)
-
-        api_key.is_valid -= 1
-        api_key.save()
-        if api_key.is_valid >= 0:
-            emailFiderStatus = emailFinder(SECRET_KEY, domain, name)
-            if emailFiderStatus['status'] == "valid":
+        validate_api_count = processApikey(uuid,api_services)
+        data_count = json.loads(validate_api_count)
+        if data_count['success'] : 
+            if data_count['count'] >= 0:
+                print("---Data count is ok---")
+                emailFiderStatus = emailFinder(SECRET_KEY, domain, name)
+                if emailFiderStatus['status'] == "valid":
+                    return Response({
+                        "success": True,
+                        "message":"found a valid email",
+                        "result": emailFiderStatus,
+                        "credits": data_count['count']
+                    })
+                else :
+                    return Response({
+                        "success": False,
+                        "message":"Not found a valid email",
+                        "result": emailFiderStatus["failure_reason"],
+                        "credits": data_count['count']
+                    })
+            else:
                 return Response({
-                    "success": True,
-                    "message":"found a valid email",
-                    "result": emailFiderStatus
-                })
-            else :
-                return Response({
-                    "success": False,
-                    "message":"Not found a valid email",
-                    "result": emailFiderStatus["failure_reason"]
-                })
+                "success": False,
+                "message": data_count['message'],
+                "credits": data_count['count']
+                },status=status.HTTP_200_OK)
         else:
             return Response({
                 "success": False,
-                "message": "Limit exceeded"
-            }, status=status.HTTP_423_LOCKED)
+                "message": data_count['message']
+            }, status=status.HTTP_400_BAD_REQUEST)
 
     def handle_error(self, request):
         return Response({

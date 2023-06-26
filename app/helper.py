@@ -86,3 +86,14 @@ def emailFinder(api_key, domain, name):
     params = {"api_key": api_key, "domain": domain, "first_name": name}
     response = requests.get(url, params=params)
     return json.loads(response.content)
+
+
+def processApikey(api_key, api_services):
+    url = 'https://100105.pythonanywhere.com/api/v1/process-api-key/'
+    payload = {
+        "api_key" : api_key,
+        "api_services" : api_services
+    }
+
+    response = requests.post(url, json=payload)
+    return response.text
