@@ -503,7 +503,7 @@ class subscribeToNewsletters(APIView):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class sendNewsLetterToInternalTeam(APIView):
-    def post(self, request):
+    def get(self, request):
         field = {
             "APIKey":"e4f8bbdf-d998-4b3a-bc21-e99ab8267c86"
         }

@@ -18,4 +18,5 @@ urlpatterns = [
     path('newsletter/',subscribeToInternalTeam.as_view()),
     path('validate-exhibitor-email/',validateExhibitorMail.as_view()),
     path('send-api-key/',sendAPIkey.as_view()),
+    path('payment-status/',send_payment_status.as_view()),
 ]
