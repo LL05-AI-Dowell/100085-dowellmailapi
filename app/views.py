@@ -17,8 +17,8 @@ from dotenv import load_dotenv
 import csv
 
 
-# load_dotenv()
-load_dotenv("/home/100085/100085-dowellmailapi/.env")
+load_dotenv()
+# load_dotenv("/home/100085/100085-dowellmailapi/.env")
 SECRET_KEY = str(os.getenv('SECRET_KEY'))
 @method_decorator(csrf_exempt, name='dispatch')
 class generateKey(APIView):
@@ -333,7 +333,8 @@ class subscribeToNewsletters(APIView):
                             "typeOfSubscriber":typeOfSubscriber,
                             "APIKey":uuid,
                             "API Owner Name": serializer.data["name"],
-                            "API Owner Email": serializer.data["email"]
+                            "API Owner Email": serializer.data["email"],
+                            "reason_to_unsubscribe": ""
                         }
                         update_field = {
                             "status": "OK",
@@ -411,7 +412,8 @@ class subscribeToNewsletters(APIView):
                                 "typeOfSubscriber":typeOfSubscriber,
                                 "APIKey":uuid,
                                 "API Owner Name": serializer.data["name"],
-                                "API Owner Email": serializer.data["email"]
+                                "API Owner Email": serializer.data["email"],
+                                "reason_to_unsubscribe": ""
                             }
                             update_field = {
                                 "status": "OK",
@@ -451,6 +453,7 @@ class subscribeToNewsletters(APIView):
         topic = request.data.get('topic')
         subscriberEmail = request.data.get('subscriberEmail')
         typeOfSubscriber = request.data.get('typeOfSubscriber')
+        reason_to_unsubscribe = request.data.get('reasonToUnsubscribe',None)
         field = {
             "APIKey": uuid
         }
@@ -487,7 +490,9 @@ class subscribeToNewsletters(APIView):
                 "_id":data["document_id"]
             }
             update_field = {
-                "subscriberStatus": False
+                "subscriberStatus": False,
+                "reason_to_unsubscribe": reason_to_unsubscribe
+
             }
             update_subscriber_status = dowellconnection(*subscriber_management,"update",field,update_field)
             return Response({
