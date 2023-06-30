@@ -114,7 +114,7 @@ class sendmail(APIView):
         fromemail = request.data.get('fromEmail')
         subject = request.data.get('subject')
         email_body = request.data.get('body')
-        print("---Got the required parameters to send mail---", topic,toemail, toname, fromemail,subject, email_body)
+        print("---Got the required parameters to send mail---", topic,toemail, toname, fromemail,subject, email_body,uuid)
 
         field = {
             "topic": topic
