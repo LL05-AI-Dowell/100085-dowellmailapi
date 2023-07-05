@@ -97,3 +97,21 @@ def processApikey(api_key, api_services):
 
     response = requests.post(url, json=payload)
     return response.text
+
+
+def originalAI(api_key,content,title):
+    url = "https://api.originality.ai/api/v1/scan/ai"
+
+    payload = {
+        "content": content,
+        "title": title,
+        "aiModelVersion": "1"
+    }
+    headers = {
+        "X-OAI-API-KEY": api_key,
+        "Accept": "application/json"
+    }
+
+    response = requests.post(url, json=payload, headers=headers)
+
+    return response.text

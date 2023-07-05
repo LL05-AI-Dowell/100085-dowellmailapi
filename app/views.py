@@ -15,11 +15,14 @@ from database.database_management import *
 from mailapp.sendinblue import getHTMLContent as gTH
 from dotenv import load_dotenv
 import csv
-
+from .helper import originalAI
 
 load_dotenv()
 # load_dotenv("/home/100085/100085-dowellmailapi/.env")
 SECRET_KEY = str(os.getenv('SECRET_KEY'))
+ORIGINAL_API_KEY = str(os.getenv('ORIGINAL_API_KEY'))
+
+
 @method_decorator(csrf_exempt, name='dispatch')
 class generateKey(APIView):
     def post(self, request):
@@ -589,3 +592,35 @@ class unsubscribeToNewsletter(APIView):
                 "success": True,
                 "message":f"Hi {subscriberEmail}, you have already unsubscribed."
                 }, status=status.HTTP_200_OK)
+
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class originalAITest(APIView):
+    def post(self, request ):
+
+        api_key = ORIGINAL_API_KEY
+        print(api_key)
+        content = request.data.get('content')
+        title = request.data.get('title')
+
+        field = {
+            "content": content,
+            "title": title
+        }
+
+        serializer = APIInputCheckup(data=field)
+        if serializer.is_valid():
+            response = originalAI(content, title)
+            data = json.loads(response)
+            return Response({
+                "success": True,
+                "message": "The test was successful",
+                "data": data
+            },status=status.HTTP_200_OK)
+        else:
+            return Response({
+                "success": False,
+                "message": "The test was not successful",
+            },status=status.HTTP_200_OK)
+    
