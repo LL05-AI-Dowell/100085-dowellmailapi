@@ -611,7 +611,8 @@ class originalAITest(APIView):
 
         serializer = APIInputCheckup(data=field)
         if serializer.is_valid():
-            response = originalAI(content, title)
+            # return Response("ok")
+            response = originalAI(api_key,content, title)
             data = json.loads(response)
             return Response({
                 "success": True,
