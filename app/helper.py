@@ -88,11 +88,11 @@ def emailFinder(api_key, domain, name):
     return json.loads(response.content)
 
 
-def processApikey(api_key, api_services):
+def processApikey(api_key):
     url = 'https://100105.pythonanywhere.com/api/v1/process-api-key/'
     payload = {
         "api_key" : api_key,
-        "api_services" : api_services
+        "api_service_id" : "DOWELL100018"
     }
 
     response = requests.post(url, json=payload)

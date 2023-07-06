@@ -64,22 +64,21 @@ class generateKey(APIView):
 class sendmail(APIView):
     def post(self, request, uuid):
         type_request = request.GET.get('type')
-        api_services = request.GET.get('service')
 
         if type_request == "validate":
-            return self.validate_email(request,uuid,api_services)
+            return self.validate_email(request,uuid)
         elif type_request == 'send-email':
-            return self.send_email(request,uuid,api_services)
+            return self.send_email(request,uuid)
         elif type_request == 'email-finder':
-            return self.email_finder(request,uuid,api_services)
+            return self.email_finder(request,uuid)
         else:
             return self.handle_error(request)
 
-    def validate_email(self, request,uuid,api_services):
+    def validate_email(self, request,uuid):
         email = request.data.get('email')
         print("---Got the required parameter to send mail---",email)
         
-        validate_api_count = processApikey(uuid,api_services)
+        validate_api_count = processApikey(uuid)
         data_count = json.loads(validate_api_count)
         print("---data_count---",data_count)
         if data_count['success'] :
@@ -109,7 +108,7 @@ class sendmail(APIView):
                 "message": data_count['message']
             }, status=status.HTTP_400_BAD_REQUEST)
 
-    def send_email(self, request ,uuid,api_services):
+    def send_email(self, request ,uuid):
         topic = "EditorMailComponent"
         toemail = request.data.get('email')
         toname = request.data.get('name')
@@ -140,7 +139,7 @@ class sendmail(APIView):
 
         emailBody = htmlTemplateContent.format(toname, email_body)
 
-        validate_api_count = processApikey(uuid,api_services)
+        validate_api_count = processApikey(uuid)
         data_count = json.loads(validate_api_count)
         if data_count['success'] :
             if data_count['count'] >= 0:
@@ -188,11 +187,11 @@ class sendmail(APIView):
                 "message": data_count['message']
             }, status=status.HTTP_400_BAD_REQUEST)
 
-    def email_finder(self,request,uuid,api_services):
+    def email_finder(self,request,uuid):
         name = request.data.get('name')
         domain = request.data.get('domain')
         print(name, domain,uuid)
-        validate_api_count = processApikey(uuid,api_services)
+        validate_api_count = processApikey(uuid)
         data_count = json.loads(validate_api_count)
         if data_count['success'] : 
             if data_count['count'] >= 0:
