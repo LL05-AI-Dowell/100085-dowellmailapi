@@ -21,5 +21,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', serverReports.as_view()),
     path('api/',(include('mailapp.urls'))),
-    path('api/v1/',(include('app.urls')))
+    path('api/v1/',(include('app.urls'))),
+    path('uxlivinglab/v1/content-scan/',(include('originalityAI.urls'))),
 ]
