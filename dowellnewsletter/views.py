@@ -81,7 +81,7 @@ class newslettersystem(APIView):
 
                                 return Response({
                                     "success": True,
-                                    "message": f"Hi {subscriberEmail} , Thank you for subscribing to UX Living Lab newsletter",
+                                    "message": f"Hi {subscriberEmail} , Thank you for subscribing to newsletter",
                                     "Details": field,
                                     "DATABASE INFO":json.loads(insert_subscriber_data),
                                     "Credits": data_count['count']
@@ -113,7 +113,7 @@ class newslettersystem(APIView):
                                         print("The combination is present and the status is true.")
                                         return Response({
                                             "success":True,
-                                            "message":f"Hi {subscriberEmail}, You have already subscribed to UX Living Lab newsletter",
+                                            "message":f"Hi {subscriberEmail}, You have already subscribed to newsletter",
                                             "Credits": data_count['count']
                                         },status=status.HTTP_200_OK)
                                     else:
@@ -131,7 +131,7 @@ class newslettersystem(APIView):
 
                                                 return Response({
                                                     "success":True,
-                                                    "message":f"Hi {subscriberEmail} , Thank you for resubscribing to UX Living Lab newsletter",
+                                                    "message":f"Hi {subscriberEmail} , Thank you for resubscribing to newsletter",
                                                     "Credits": data_count['count']
                                                 },status=status.HTTP_200_OK)
                                 else:            
@@ -152,7 +152,7 @@ class newslettersystem(APIView):
 
                                     return Response({
                                         "success": True,
-                                        "message": f"Hi {subscriberEmail}, Thank you for subscribing to UX Living Lab newsletter",
+                                        "message": f"Hi {subscriberEmail}, Thank you for subscribing to newsletter",
                                         "Details": field,
                                         "DATABASE INFO":json.loads(insert_subscriber_data),
                                         "Credits":data_count['count']
