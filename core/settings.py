@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     "corsheaders",
     'mailapp',
     'app',
-    'originalityAI'
+    'originalityAI',
+    'dowellnewsletter'
 ]
 
 MIDDLEWARE = [
