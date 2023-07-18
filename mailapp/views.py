@@ -20,8 +20,8 @@ from mailapp.zeroBounce import validateMail as vE
 from mailapp.zeroBounce.validateMail import emailFinder
 from dotenv import load_dotenv
 
-load_dotenv()
-# load_dotenv("/home/100085/100085-dowellmailapi/.env")
+# load_dotenv()
+load_dotenv("/home/100085/100085-dowellmailapi/.env")
 SECRET_KEY = str(os.getenv('SECRET_KEY')) 
 API_KEY = str(os.getenv('API_KEY')) 
 
