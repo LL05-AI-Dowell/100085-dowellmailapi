@@ -19,4 +19,5 @@ urlpatterns = [
     path('validate-exhibitor-email/',validateExhibitorMail.as_view()),
     path('send-api-key/',sendAPIkey.as_view()),
     path('payment-status/',send_payment_status.as_view()),
+    path('hr-invitation/',send_mail_from_hr.as_view()),
 ]
