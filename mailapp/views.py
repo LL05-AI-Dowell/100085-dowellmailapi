@@ -65,10 +65,10 @@ HR_MAIL = '''
 </head>
 <body>
     <div style="width: 80%; margin: 0 auto;font-family: 'Poppins', sans-serif;">
-        <img src="http://67.217.61.253/hr/logo-2-min-min.png" alt="Dowell Logo" width="250px" height="250px" style="display: block; margin: 0 auto;">
+        <img src="http://67.217.61.253/hr/logo-2-min-min.png" alt="Dowell Logo" width="50px" height="50px" style="display: block; margin: 0 auto;">
         <div style="width: 80%; margin: 0 auto; text-align: center;">
             <p style="font-size: 2rem; font-weight: 700;">Hello {},</p>
-            <img src="https://img.freepik.com/free-vector/reading-letter-concept-illustration_114360-4591.jpg?size=626&ext=jpg&ga=GA1.1.225976907.1673277028&semt=sph" alt="mail-logo" width="400px" height="400px">
+            <img src="https://img.freepik.com/free-vector/reading-letter-concept-illustration_114360-4591.jpg?size=626&ext=jpg&ga=GA1.1.225976907.1673277028&semt=sph" alt="mail-logo" width="200px" height="200px">
         </div>
         <div style="width: 80%; margin: 0 auto; text-align: center;">
             <p style="font-weight: 400; margin: 0; margin-bottom: 1.5rem; margin-top: 1rem;">Congratulations! Your application for {} has been approved at DoWell UX Living Lab.</p>
