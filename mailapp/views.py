@@ -64,17 +64,17 @@ HR_MAIL = '''
     <link href="https://fonts.googleapis.com/css2?family=Inter&family=Poppins&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div style="width: 80%; margin: 0 auto; display: flex; justify-content: center; flex-direction: column; align-items: center; font-family: 'Poppins', sans-serif; ">
-        <img src="http://67.217.61.253/hr/logo-2-min-min.png" alt="Dowell Logo" width="250px" height="250px">
-        <div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
+    <div style="width: 80%; margin: 0 auto;font-family: 'Poppins', sans-serif;">
+        <img src="http://67.217.61.253/hr/logo-2-min-min.png" alt="Dowell Logo" width="250px" height="250px" style="display: block; margin: 0 auto;">
+        <div style="width: 80%; margin: 0 auto; text-align: center;">
             <p style="font-size: 2rem; font-weight: 700;">Hello {},</p>
             <img src="https://img.freepik.com/free-vector/reading-letter-concept-illustration_114360-4591.jpg?size=626&ext=jpg&ga=GA1.1.225976907.1673277028&semt=sph" alt="mail-logo" width="400px" height="400px">
         </div>
-        <div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
-            <p style="font-weight: 400; margin: 0; margin-bottom: 1.5rem; margin-top: 1rem;">Congratulations! Your application for {} has been approved.</p>
+        <div style="width: 80%; margin: 0 auto; text-align: center;">
+            <p style="font-weight: 400; margin: 0; margin-bottom: 1.5rem; margin-top: 1rem;">Congratulations! Your application for {} has been approved at DoWell UX Living Lab.</p>
             <p style="font-weight: 400; margin: 0; margin-bottom: 1.5rem;">Kindly use the button below to create an account and track your application progress.</p> 
-            <a href="{}" style="text-decoration: none; cursor: pointer; background-color: #005734; padding: 1rem; border-radius: 0.5rem;">
-                <p style="display: inline-block; margin: 0; color: #fff; font-weight: 400;">
+            <a href="{}" style="text-decoration: none; cursor: pointer; background-color: #005734; padding: 1rem; border-radius: 0.5rem; display: block; margin: 5rem auto 0; width: max-content;">
+                <p style="display: inline-block; margin: 0; color: #fff; font-weight: 600;">
                     Complete full signup
                 </p>
             </a>
