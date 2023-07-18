@@ -836,3 +836,49 @@ class send_mail_from_hr(APIView):
                 "message":"Email varification failed",
                 "error":email_validation['status']
             },status=status.HTTP_400_BAD_REQUEST)
+        
+@method_decorator(csrf_exempt, name='dispatch')
+class hr_mail(APIView):
+    def post(self, request):
+        file = request.FILES.get('file')
+        toemail = request.data.get('toemail')
+        toname = request.data.get('toname') 
+        subject = request.data.get('subject')
+        print("---Got the required parameter to send mail---",toemail,toname)
+        file_content = file.read().decode('utf-8') 
+        print("---Got the template the htmlContent---")
+        emailBody = file_content
+        print("---Checking whether email is valid---")
+        email_validation = vE.validateMail(SECRET_KEY,toemail)
+        if email_validation['status'] == "valid":
+            print("---Email is valid---")
+            configuration = sib_api_v3_sdk.Configuration()
+            configuration.api_key['api-key'] = API_KEY
+            api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
+            subject = subject
+            html_content = emailBody
+            sender = {"name": "DoWell UX living Lab", "email": "uxlivinglab@dowellresearch.in"}
+            to = [{"email": toemail, "name": toname}]
+            headers = {"Some-Custom-Name": "unique-id-1234"}
+            print("---All the data are gethered and ready to send mail---")
+            send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(to=to, headers=headers,html_content=html_content, sender=sender, subject=subject)
+            try:
+                api_response = api_instance.send_transac_email(send_smtp_email)
+                api_response_dict = api_response.to_dict()
+                print("---The mail has been sent ! Happy :D---")
+                return Response({
+                    "success": True,
+                    "message":"Mail has been sent!!"
+                },status=status.HTTP_200_OK)
+            except ApiException as e:
+                return Response({
+                    "success":False,
+                    "message":"Failed to send mail",
+                    "error":"Exception when calling SMTPApi->send_transac_email: %s\n" % e
+                },status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({
+                "success":False,
+                "message":"Email varification failed",
+                "error":email_validation['status']
+            },status=status.HTTP_400_BAD_REQUEST)
