@@ -57,22 +57,29 @@ HR_MAIL = '''
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editor mail</title>
+    <title>FULL SIGNUP MAIL</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter&family=Poppins&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div style="font-family: Helvetica,Arial,sans-serif;min-width:100px;overflow:auto;line-height:2">
-        <div style="margin:50px auto;width:70%;padding:20px 0">
-          <div style="border-bottom:1px solid #eee">
-            <a href="#" style="font-size:1.2em;color: #00466a;text-decoration:none;font-weight:600">Dowell UX Living Lab</a>
-          </div>
-          <p style="font-size:1.1em">WELCOME TO DOWELL API SERVICES</p>
-          <p style="font-size:1.1em">Hi {},</p>
-          <p style="font-size:1.1em">job role{},</p>
-          <p style="font-size:1.1em">{},</p>
+    <div style="width: 80%; margin: 0 auto; display: flex; justify-content: center; flex-direction: column; align-items: center; font-family: 'Poppins', sans-serif; ">
+        <img src="http://67.217.61.253/hr/logo-2-min-min.png" alt="Dowell Logo" width="250px" height="250px">
+        <div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
+            <p style="font-size: 2rem; font-weight: 700;">Hello {},</p>
+            <img src="https://img.freepik.com/free-vector/reading-letter-concept-illustration_114360-4591.jpg?size=626&ext=jpg&ga=GA1.1.225976907.1673277028&semt=sph" alt="mail-logo" width="400px" height="400px">
         </div>
-      </div>
+        <div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
+            <p style="font-weight: 400; margin: 0; margin-bottom: 1.5rem; margin-top: 1rem;">Congratulations! Your application for {} has been approved.</p>
+            <p style="font-weight: 400; margin: 0; margin-bottom: 1.5rem;">Kindly use the button below to create an account and track your application progress.</p> 
+            <a href="{}" style="text-decoration: none; cursor: pointer; background-color: #005734; padding: 1rem; border-radius: 0.5rem;">
+                <p style="display: inline-block; margin: 0; color: #fff; font-weight: 400;">
+                    Complete full signup
+                </p>
+            </a>
+        </div>
+    </div>
 </body>
 </html>
 '''
