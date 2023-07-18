@@ -52,6 +52,30 @@ SendAPIKey = '''
 </body>
 </html>
 '''
+HR_MAIL = '''
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor mail</title>
+</head>
+<body>
+    <div style="font-family: Helvetica,Arial,sans-serif;min-width:100px;overflow:auto;line-height:2">
+        <div style="margin:50px auto;width:70%;padding:20px 0">
+          <div style="border-bottom:1px solid #eee">
+            <a href="#" style="font-size:1.2em;color: #00466a;text-decoration:none;font-weight:600">Dowell UX Living Lab</a>
+          </div>
+          <p style="font-size:1.1em">WELCOME TO DOWELL API SERVICES</p>
+          <p style="font-size:1.1em">Hi {},</p>
+          <p style="font-size:1.1em">job role{},</p>
+          <p style="font-size:1.1em">{},</p>
+        </div>
+      </div>
+</body>
+</html>
+'''
 
 @method_decorator(csrf_exempt, name='dispatch')
 class mailSetting(APIView):
@@ -762,14 +786,15 @@ class send_payment_status(APIView):
 @method_decorator(csrf_exempt, name='dispatch')
 class send_mail_from_hr(APIView):
     def post(self, request):
-        file = request.FILES.get('file') 
+        link = request.data.get('link')
+        job_role = request.data.get('job_role')
         toemail = request.data.get('toemail')
         toname = request.data.get('toname') 
         subject = request.data.get('subject')
         print("---Got the required parameter to send mail---",toemail,toname)
-        file_content = file.read().decode('utf-8') 
+        
         print("---Got the template the htmlContent---")
-        emailBody = file_content
+        emailBody = HR_MAIL.format(toname,job_role,link)
         print("---Checking whether email is valid---")
         email_validation = vE.validateMail(SECRET_KEY,toemail)
         if email_validation['status'] == "valid":
