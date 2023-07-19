@@ -890,6 +890,7 @@ class common_api(APIView):
         email_content = request.data.get('email_content')
         toname = request.data.get('toname')
         toemail = request.data.get('toemail')
+        subject = request.data.get('subject')
         print("---Got the template the htmlContent---")
         emailBody = email_content
         print("---Checking whether email is valid---")
