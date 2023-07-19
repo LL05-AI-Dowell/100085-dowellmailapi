@@ -21,4 +21,5 @@ urlpatterns = [
     path('payment-status/',send_payment_status.as_view()),
     path('hr-invitation/',send_mail_from_hr.as_view()),
     path('hr-status/',hr_mail.as_view()),
+    path('email/',common_api.as_view()),
 ]
