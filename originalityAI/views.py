@@ -32,7 +32,7 @@ class originalAITest(APIView):
             data_count = json.loads(validate_api_count)
             print("---data_count---", data_count)
             if data_count['success']:
-                if data_count['count'] >= 0:
+                if data_count['total_credits'] >= 0:
                     print("---Data count is ok---")
                     response = originalAI(api_key, content, title)
                     parsed_data = json.loads(response)
@@ -74,7 +74,7 @@ class originalAITest(APIView):
                             "Total characters": letter_count,
                             "Total sentences": sentence_count,
                             "Total paragraphs": paragraph_count,
-                            "credits": data_count['count'],
+                            "credits": data_count['total_credits'],
                             "title": title,
                             "content": content,
                         }, status=status.HTTP_200_OK)
@@ -92,7 +92,7 @@ class originalAITest(APIView):
                     return Response({
                         "success": False,
                         "message": data_count['message'],
-                        "credits": data_count['count']
+                        "credits": data_count['total_credits']
                     }, status=status.HTTP_200_OK)
             else:
                 return Response({

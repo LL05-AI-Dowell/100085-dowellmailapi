@@ -56,9 +56,10 @@ class newslettersystem(APIView):
                 print("---all subacriber data is fetched---")
                 validate_api_count = processApikey(api_key)
                 data_count = json.loads(validate_api_count)
+                print("---data count is---",data_count)
                 print("---data_count---",data_count)
                 if data_count['success'] :
-                    if data_count['count'] >= 0 :
+                    if data_count['total_credits'] >= 0 :
                         print("---Data count is ok---")
                         email_validation = validateMail(SECRET_KEY,subscriberEmail)
                         print("---Checking the the email is valid---")
@@ -155,19 +156,19 @@ class newslettersystem(APIView):
                                         "message": f"Hi {subscriberEmail}, Thank you for subscribing to newsletter",
                                         "Details": field,
                                         "DATABASE INFO":json.loads(insert_subscriber_data),
-                                        "Credits":data_count['count']
+                                        "Credits":data_count['total_credits']
                                     },status=status.HTTP_201_CREATED)
                         else:
                             return Response({
                                 "success": False,
                                 "message": f"{subscriberEmail} is not a valid email",
-                                "Credits":data_count['count']
+                                "Credits":data_count['total_credits']
                             },status=status.HTTP_200_OK)
                     else :
                         return Response({
                             "success": False,
                             "message": data_count['message'],
-                            "credits": data_count['count']
+                            "credits": data_count['total_credits']
                         }, status=status.HTTP_200_OK)
                 else:
                     return Response({
@@ -194,7 +195,7 @@ class newslettersystem(APIView):
         data_count = json.loads(validate_api_count)
         print("---data_count---",data_count)
         if data_count['success'] :
-            if data_count['count'] >= 0 :
+            if data_count['total_credits'] >= 0 :
                 print("---Data count is ok---")
                 field = {
                     "subscriberEmail": subscriberEmail ,
@@ -237,7 +238,7 @@ class newslettersystem(APIView):
                 return Response({
                     "success": False,
                     "message": data_count['message'],
-                    "credits": data_count['count']
+                    "credits": data_count['total_credits']
                 }, status=status.HTTP_200_OK)
         else:
             return Response({
@@ -257,7 +258,7 @@ class newslettersystem(APIView):
         data_count = json.loads(validate_api_count)
         print("---data_count---",data_count)
         if data_count['success'] :
-            if data_count['count'] >= 0 :
+            if data_count['total_credits'] >= 0 :
                 print("---Data count is ok---")
                 configuration = sib_api_v3_sdk.Configuration()
                 configuration.api_key['api-key'] = SENDINGBLUE_API_KEY
@@ -276,7 +277,7 @@ class newslettersystem(APIView):
                     return Response({
                         "success": True,
                         "message":"Mail has been sent!!",
-                        "Credits":data_count['count']
+                        "Credits":data_count['total_credits']
                     },status=status.HTTP_200_OK)
                 except ApiException as e:
                     return Response({
@@ -287,7 +288,7 @@ class newslettersystem(APIView):
                 return Response({
                     "success": False,
                     "message": data_count['message'],
-                    "credits": data_count['count']
+                    "credits": data_count['total_credits']
                 }, status=status.HTTP_200_OK)
         else:
             return Response({

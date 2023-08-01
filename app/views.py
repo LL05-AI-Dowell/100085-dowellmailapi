@@ -79,26 +79,27 @@ class sendmail(APIView):
         validate_api_count = processApikey(uuid)
         data_count = json.loads(validate_api_count)
         print("---data_count---",data_count)
+    
         if data_count['success'] :
-            if data_count['count'] >= 0 :
+            if data_count['total_credits'] >= 0 :
                 print("---Data count is ok---")
                 email_validation = validateMail(SECRET_KEY,email)
                 if email_validation['status'] == "valid":
                     return Response({
                         "success": True,
                         "message": f"Hurray ! {email} is a valid email",
-                        "credits": data_count['count']
+                        "credits": data_count['total_credits']
                     },status=status.HTTP_200_OK)
                 else:
                     return Response({
                         "success": False,
                         "message": f"Sorry ! {email} is not a valid email",
-                        "creits": data_count['count']
+                        "creits": data_count['total_credits']
                     },status=status.HTTP_200_OK)
             return Response({
                 "success": False,
                 "message": data_count['message'],
-                "credits": data_count['count']
+                "credits": data_count['total_credits']
             }, status=status.HTTP_200_OK)
         else:
             return Response({
@@ -140,7 +141,7 @@ class sendmail(APIView):
         validate_api_count = processApikey(uuid)
         data_count = json.loads(validate_api_count)
         if data_count['success'] :
-            if data_count['count'] >= 0:
+            if data_count['total_credits'] >= 0:
                 print("---Data count is ok---")
                 email_validation = validateMail(SECRET_KEY,toemail)
                 print(email_validation)
@@ -163,7 +164,7 @@ class sendmail(APIView):
                             "success": True,
                             "message":"Mail has been sent!!",
                             "send status":json.dumps(api_response_dict),
-                            "credits": data_count['count']
+                            "credits": data_count['total_credits']
                         },status=status.HTTP_200_OK)
                     except ApiException as e:
                         return Response({"error":"Exception when calling SMTPApi->send_transac_email: %s\n" % e},status=status.HTTP_400_BAD_REQUEST)
@@ -171,13 +172,13 @@ class sendmail(APIView):
                     return Response({
                     "success": False,
                     "message": f"Sorry ! {toemail} is not a valid email",
-                    "credits": data_count['count']
+                    "credits": data_count['total_credits']
                 },status=status.HTTP_200_OK)
             else:
                 return Response({
                 "success": False,
                 "message": data_count['message'],
-                "credits": data_count['count']
+                "credits": data_count['total_credits']
                 },status=status.HTTP_200_OK)
         else:
             return Response({
@@ -192,7 +193,7 @@ class sendmail(APIView):
         validate_api_count = processApikey(uuid)
         data_count = json.loads(validate_api_count)
         if data_count['success'] : 
-            if data_count['count'] >= 0:
+            if data_count['total_credits'] >= 0:
                 print("---Data count is ok---")
                 emailFiderStatus = emailFinder(SECRET_KEY, domain, name)
                 if emailFiderStatus['status'] == "valid":
@@ -200,20 +201,20 @@ class sendmail(APIView):
                         "success": True,
                         "message":"found a valid email",
                         "result": emailFiderStatus,
-                        "credits": data_count['count']
+                        "credits": data_count['total_credits']
                     })
                 else :
                     return Response({
                         "success": False,
                         "message":"Not found a valid email",
                         "result": emailFiderStatus["failure_reason"],
-                        "credits": data_count['count']
+                        "credits": data_count['total_credits']
                     })
             else:
                 return Response({
                 "success": False,
                 "message": data_count['message'],
-                "credits": data_count['count']
+                "credits": data_count['total_credits']
                 },status=status.HTTP_200_OK)
         else:
             return Response({
