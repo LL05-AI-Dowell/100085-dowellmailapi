@@ -10,8 +10,16 @@ def validateMail(api_key,email):
     params = {"email": email, "api_key": api_key, "ip_address":ip_address}
 
     response = requests.get(url, params=params)
-    return json.loads(response.content)
-
+    print(response.text)
+    response = json.loads(response.text)
+    if response["status"] == "valid" or response["status"] == "do_not_mail" :
+        response = {
+            "status": "valid"
+        }
+        return response
+    else :
+        response = {"status": "Something went wrong"}
+        return response
 def emailFinder(api_key, domain, name):
     url = "https://api.zerobounce.net/v2/guessformat"
     params = {"api_key": api_key, "domain": domain, "first_name": name}
