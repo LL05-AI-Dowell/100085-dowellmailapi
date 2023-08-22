@@ -104,3 +104,70 @@ class originalAITest(APIView):
                 "success": False,
                 "message": serializer.errors,
             }, status=status.HTTP_200_OK)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class originalAITestInternal(APIView):
+    def post(self, request):
+        api_key = ORIGINAL_API_KEY
+        content = request.data.get('content')
+        title = request.data.get('title')
+
+        field = {
+            "content": content,
+            "title": title
+        }
+
+        serializer = APIInputCheckup(data=field)
+        if serializer.is_valid():
+            response = originalAI(api_key, content, title)
+            parsed_data = json.loads(response)
+
+            if 'success' in parsed_data and parsed_data['success']:
+                originality_score = parsed_data['ai']['score']['original']
+                ai_score = parsed_data['ai']['score']['ai']
+                plagiarism_text_score = float(parsed_data['plagiarism']['total_text_score'].strip('%'))
+
+                originality_score_percent = originality_score * 100
+                ai_score_percent = ai_score * 100
+                creative = 100 - plagiarism_text_score
+
+                readability_stats = parsed_data['readability']['textStats']
+                letter_count = readability_stats['letterCount']
+                sentence_count = readability_stats['sentenceCount']
+                paragraph_count = readability_stats['paragraphCount']
+
+                if ai_score <= 0.10:
+                    category = "Written by Human"
+                elif ai_score <= 0.30:
+                    category = "Most Probably by Human"
+                elif ai_score <= 0.70:
+                    category = "Either by Human/AI"
+                elif ai_score <= 0.90:
+                    category = "Most Probably by AI"
+                else:
+                    category = "Written by AI"
+
+                return Response({
+                    "success": True,
+                    "message": "The test was successful",
+                    "Confidence level created by AI": f"{ai_score_percent:.2f}%",
+                    "Confidence level created by Human": f"{originality_score_percent:.2f}%",
+                    "AI Check": "{}".format(category),
+                    "Plagiarised": "{:.2f}%".format(plagiarism_text_score),
+                    "Creative": "{:.2f}%".format(creative),
+                    "Total characters": letter_count,
+                    "Total sentences": sentence_count,
+                    "Total paragraphs": paragraph_count,
+                    "title": title,
+                    "content": content,
+                }, status=status.HTTP_200_OK)
+            elif 'error' in parsed_data:
+                return Response({
+                    "success": False,
+                    "message": parsed_data['error']
+                })
+        return Response({
+            "success": False,
+            "message": serializer.errors,
+        }, status=status.HTTP_200_OK)
