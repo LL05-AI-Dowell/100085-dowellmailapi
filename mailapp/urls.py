@@ -22,4 +22,5 @@ urlpatterns = [
     path('hr-invitation/',send_mail_from_hr.as_view()),
     path('hr-status/',hr_mail.as_view()),
     path('email/',common_api.as_view()),
+    path('uxlivinglab/email/',common_email_api.as_view()),
 ]
