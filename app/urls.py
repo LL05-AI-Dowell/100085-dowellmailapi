@@ -9,4 +9,5 @@ urlpatterns = [
     path('subscribe-newsletter/<str:uuid>/',subscribeToNewsletters.as_view()),
     path('send-newsletter/',sendNewsLetterToInternalTeam.as_view()),
     path('unsubscribe-newsletter/<str:uuid>/<str:topic>/<str:typeOfSubscriber>/<str:subscriberEmail>/',unsubscribeToNewsletter.as_view()),
+    path('dowell-sms/<str:service_key>/',dowellsms.as_view()),
 ]

@@ -19,6 +19,7 @@ import csv
 load_dotenv()
 # load_dotenv("/home/100085/100085-dowellmailapi/.env")
 SECRET_KEY = str(os.getenv('SECRET_KEY'))
+API_KEY = str(os.getenv('API_KEY'))
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -591,5 +592,35 @@ class unsubscribeToNewsletter(APIView):
                 "message":f"Hi {subscriberEmail}, you have already unsubscribed."
                 }, status=status.HTTP_200_OK)
 
+@method_decorator(csrf_exempt, name= "dispatch")
+class dowellsms(APIView):
+    def post(self, request,service_key):
+        sender = request.data.get('sender')
+        recipient = request.data.get('recipient')
+        content = request.data.get('content')
+        created_by = request.data.get('created_by')
+        print("---Got the key from the database---")
+        configuration = sib_api_v3_sdk.Configuration()
+        configuration.api_key['api-key'] = API_KEY
 
+        api_instance = sib_api_v3_sdk.TransactionalSMSApi(sib_api_v3_sdk.ApiClient(configuration))
+        send_transac_sms = sib_api_v3_sdk.SendTransacSms(sender=sender, recipient=recipient, content=content)
+
+        try:
+            credit_system = json.loads(processApikeySMS(service_key))
+            if credit_system["success"]:
+                api_response = api_instance.send_transac_sms(send_transac_sms)
+                api_response_dict = api_response.to_dict()
+                return Response({
+                    "success": True,
+                    "message": "SMS has been sent!!",
+                    "credits": credit_system["total_credits"],
+                },status=status.HTTP_200_OK)
+            else:
+                return Response({
+                    "success": False,
+                    "message": credit_system["message"],
+                })
+        except ApiException as e:
+            return Response({"error":"Exception when calling SMTPApi->send_transac_email: %s\n" % e},status=status.HTTP_400_BAD_REQUEST)
     
