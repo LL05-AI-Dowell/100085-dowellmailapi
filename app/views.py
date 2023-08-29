@@ -598,7 +598,7 @@ class dowellsms(APIView):
         sender = request.data.get('sender')
         recipient = request.data.get('recipient')
         content = request.data.get('content')
-        created_by = request.data.get('created_by')
+        created_by = request.data.get('created_by', None)
         print("---Got the key from the database---")
         configuration = sib_api_v3_sdk.Configuration()
         configuration.api_key['api-key'] = API_KEY
