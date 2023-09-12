@@ -893,7 +893,7 @@ class common_api(APIView):
             api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
             subject = subject
             html_content = emailBody
-            sender = {"name": "DoWell UX living Lab", "email": "uxlivinglab@dowellresearch.in"}
+            sender = {"name": "DoWell UX Living Lab", "email": "uxlivinglab@dowellresearch.sg"}
             to = [{"email": toemail, "name": toname}]
             headers = {"Some-Custom-Name": "unique-id-1234"}
             print("---All the data are gethered and ready to send mail---")
