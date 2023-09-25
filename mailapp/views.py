@@ -522,6 +522,12 @@ class dowellSMS(APIView):
         content = request.data.get('content')
         created_by = request.data.get('created_by')
         print("---Got the key from the database---")
+        print("--------------------------------",sender)
+        print("--------------------------------",created_by)
+        print("--------------------------------",recipient)
+        return Response({
+            "error":"API IS CONTROLLED BY US",
+        },status=status.HTTP_400_BAD_REQUEST)
         configuration = sib_api_v3_sdk.Configuration()
         configuration.api_key['api-key'] = API_KEY
 
