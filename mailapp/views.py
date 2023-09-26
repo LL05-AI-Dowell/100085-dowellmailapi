@@ -972,3 +972,26 @@ class common_email_api(APIView):
                 "message":"Email varification failed",
                 "error":email_validation['status']
             },status=status.HTTP_400_BAD_REQUEST)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class verify_email(APIView):
+    def post(self, request ):
+        email = request.data.get('email')
+        if not email:
+            return Response({
+               "success": False,
+                "message": "Invalid input"   
+            })
+        print("---Got the required parameter to send mail---",email)
+        email_validation = vE.validateMail(SECRET_KEY,email)
+        if email_validation['status'] == "valid":
+            return Response({
+                "success": True,
+                "message": f"Hurray ! {email} is a valid email"  
+            },status=status.HTTP_200_OK)
+        else:
+            return Response({
+                "success": False,
+                "message": f"Sorry ! {email} is not a valid email"  
+            },status=status.HTTP_400_BAD_REQUEST)
