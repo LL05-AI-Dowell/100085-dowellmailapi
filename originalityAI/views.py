@@ -31,6 +31,14 @@ EMAIL_FROM_WEBSITE = """
           <p style="font-size:1.1em">Email : {},</p>
           <p style="font-size:1.1em">Title : {},</p>
           <p style="font-size:1.1em">Content : {}</p>
+          <p style="font-size:1.1em">Confidence_level_created_by_AI : {}</p>
+          <p style="font-size:1.1em">Confidence_level_created_by_Human : {}</p>
+          <p style="font-size:1.1em">AI_Check : {}</p>
+          <p style="font-size:1.1em">Creative : {}</p>
+          <p style="font-size:1.1em">Plagiarised : {}</p>
+          <p style="font-size:1.1em">Total_characters : {}</p>
+          <p style="font-size:1.1em">Total_sentences : {}</p>
+          <p style="font-size:1.1em">Total_paragraphs : {}</p>
         </div>
       </div>
 </body>
@@ -274,8 +282,16 @@ class originalityConentTest(APIView):
                         else:
                             category = "Written by AI"
 
+                        Confidence_level_created_by_AI= f"{ai_score_percent:.2f}%",
+                        Confidence_level_created_by_Human= f"{originality_score_percent:.2f}%"
+                        AI_Check = "{}".format(category)
+                        Plagiarised = "{:.2f}%".format(plagiarism_text_score)
+                        Creative = "{:.2f}%".format(creative)
+                        Total_characters= letter_count
+                        Total_sentences= sentence_count
+                        Total_paragraphs= paragraph_count
                         subject = "Samanta campaign was used in uxlivinglab.org"
-                        email_content = EMAIL_FROM_WEBSITE.format(email,title,content)
+                        email_content = EMAIL_FROM_WEBSITE.format(email,title,content,Confidence_level_created_by_AI,Confidence_level_created_by_Human,AI_Check,Plagiarised,Creative,Total_characters,Total_sentences,Total_paragraphs)
                         send_content_email = send_email("Dowell UX Living Lab", "dowell@dowellresearch.uk", subject,email_content)
 
                         return Response({
