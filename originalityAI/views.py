@@ -291,7 +291,7 @@ class originalityConentTest(APIView):
                         Total_characters= letter_count
                         Total_sentences= sentence_count
                         Total_paragraphs= paragraph_count
-                        date_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                        date_time = datetime.datetime.now().strftime('%Y-%m-%d')
                         subject = f"{email} ,result from Samanta content evaluator on {date_time}"
                         email_content = EMAIL_FROM_WEBSITE.format(email,title,content,Confidence_level_created_by_AI,Confidence_level_created_by_Human,AI_Check,Plagiarised,Creative,Total_characters,Total_sentences,Total_paragraphs)
                         send_content_email = send_email("Dowell UX Living Lab", "dowell@dowellresearch.uk", subject,email_content)
@@ -333,7 +333,7 @@ class originalityConentTest(APIView):
                     "message": data_count['message']
                 }, status=status.HTTP_400_BAD_REQUEST)
         else:
-            date_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            date_time = datetime.datetime.now().strftime('%Y-%m-%d')
             subject = f"{email} , result from Samanta content evaluator on {date_time}"
             email_content = EMAIL_FROM_WEBSITE_FAILED.format(email,title,content,serializer.errors["content"][0])
             send_content_email = send_email("Dowell UX Living Lab", "dowell@dowellresearch.uk", subject,email_content)
