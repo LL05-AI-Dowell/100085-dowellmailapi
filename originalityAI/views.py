@@ -111,11 +111,11 @@ class originalAITest(APIView):
                         if ai_score <= 0.10:
                             category = "Written by Human"
                         elif ai_score <= 0.30:
-                            category = "Most Probably by Human"
+                            category = "Most Probably written by Human"
                         elif ai_score <= 0.70:
-                            category = "Either by Human/AI"
+                            category = "Either written by Human/AI"
                         elif ai_score <= 0.90:
-                            category = "Most Probably by AI"
+                            category = "Most Probably written by AI"
                         else:
                             category = "Written by AI"
 
@@ -196,11 +196,11 @@ class originalAITestInternal(APIView):
                 if ai_score <= 0.10:
                     category = "Written by Human"
                 elif ai_score <= 0.30:
-                    category = "Most Probably by Human"
+                    category = "Most Probably written by Human"
                 elif ai_score <= 0.70:
-                    category = "Either by Human/AI"
+                    category = "Either written by Human/AI"
                 elif ai_score <= 0.90:
-                    category = "Most Probably by AI"
+                    category = "Most Probably written by AI"
                 else:
                     category = "Written by AI"
 
@@ -275,11 +275,11 @@ class originalityConentTest(APIView):
                         if ai_score <= 0.10:
                             category = "Written by Human"
                         elif ai_score <= 0.30:
-                            category = "Most Probably by Human"
+                            category = "Most Probably written by Human"
                         elif ai_score <= 0.70:
-                            category = "Either by Human/AI"
+                            category = "Either written by Human/AI"
                         elif ai_score <= 0.90:
-                            category = "Most Probably by AI"
+                            category = "Most Probably written by AI"
                         else:
                             category = "Written by AI"
 
