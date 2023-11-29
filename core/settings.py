@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'mailapp',
     'app',
     'originalityAI',
-    'dowellnewsletter'
+    'dowellnewsletter',
+    'flikiAi'
 ]
 
 MIDDLEWARE = [

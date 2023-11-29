@@ -24,4 +24,5 @@ urlpatterns = [
     path('api/v1/',(include('app.urls'))),
     path('uxlivinglab/v1/content-scan/',(include('originalityAI.urls'))),
     path('uxlivinglab/newsletter/v1/',(include('dowellnewsletter.urls'))),
+    path('api/v1/dowell-video-generator/', include('flikiAi.urls')),
 ]
