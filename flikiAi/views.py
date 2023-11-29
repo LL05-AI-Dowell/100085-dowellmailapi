@@ -27,7 +27,7 @@ class health_check(APIView):
     def get(self, request ):
         return Response({
             "success": True,
-            "message":"Fliki AI servering is running fine"
+            "message":"Dowell Fliki AI server is running fine"
         },status=status.HTTP_200_OK)
 
 @method_decorator(csrf_exempt, name='dispatch')
