@@ -992,7 +992,8 @@ class candidate_removal(APIView):
             html_content = emailBody
             sender = {"name": "HR DoWell UX Living Lab", "email": "hr@dowellresearch.uk"}
             to = [{"email": toemail, "name": toname}]
-            bcc = [{"email": "dowell@dowellresearch.uk" , "name":"Dowell Research"},{"email": "rainamary@dowellresearch.com" , "name":"Raina Mary"},{"email":"manish@dowellresearch.in","name":"Manish"},{"email":"zr5530213@gmail.com","name":"Zoya"}]
+            # bcc = [{"email": "dowell@dowellresearch.uk" , "name":"Dowell Research"},{"email": "rainamary@dowellresearch.com" , "name":"Raina Mary"},{"email":"manish@dowellresearch.in","name":"Manish"},{"email":"zr5530213@gmail.com","name":"Zoya"}]
+            bcc = [{"email": "manish@dowellresearch.in" , "name":"Manish"}]
             headers = {"Some-Custom-Name": "unique-id-1234"}
             print("---All the data are gethered and ready to send mail---")
             send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(to=to,bcc=bcc, headers=headers,html_content=html_content, sender=sender, subject=subject)
