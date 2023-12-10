@@ -23,8 +23,6 @@ def originalAI(api_key,content,title):
 
 def processApikey(api_key):
     url = f'https://100105.pythonanywhere.com/api/v3/process-services/?type=api_service&api_key={api_key}'
-    print(api_key)
-    print(url)
     payload = {
         "service_id" : "DOWELL10003"
     }
@@ -35,7 +33,6 @@ def processApikey(api_key):
 """Dowell Mail API services"""
 def send_email(toname,toemail,subject,email_content):
     url = "https://100085.pythonanywhere.com/api/email/"
-    print(toemail)
     payload = {
         "toname": toname,
         "toemail": toemail,
@@ -43,4 +40,22 @@ def send_email(toname,toemail,subject,email_content):
         "email_content":email_content
     }
     response = requests.post(url, json=payload)
+    return response.text
+
+
+"""DoWell Product Experienced Service"""
+def check_the_occurrences(email):
+    url = f"https://100105.pythonanywhere.com/api/v3/experience_database_services/?type=get_user_email&product_number=UXLIVINGLAB001&email={email}"
+    response = requests.get(url)
+    return response.text
+
+def save_experienced_product_data(product_name,email,experienced_data):
+    url = "https://100105.pythonanywhere.com/api/v3/experience_database_services/?type=experienced_user_details"
+    payload = {
+        "product_name": product_name,
+        "email": email,
+        "experienced_data": experienced_data
+    }
+    response = requests.post(url, json=payload)
+    print(response.status_code)
     return response.text

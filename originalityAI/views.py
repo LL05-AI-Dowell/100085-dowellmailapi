@@ -10,6 +10,7 @@ from .helper import *
 from dotenv import load_dotenv
 from .serializers import *
 import datetime
+from threading import Thread
 load_dotenv()
 # load_dotenv("/home/100085/100085-dowellmailapi/.env")
 ORIGINAL_API_KEY = str(os.getenv('ORIGINAL_API_KEY'))
@@ -340,4 +341,134 @@ class originalityConentTest(APIView):
             return Response({
                 "success": False,
                 "message": serializer.errors,
+            }, status=status.HTTP_200_OK)
+
+@method_decorator(csrf_exempt, name='dispatch')
+class originalityContentTestSaveToDB(APIView):
+    def post(self, request, userapikey):
+        api_key = ORIGINAL_API_KEY
+        content = request.data.get('content')
+        title = request.data.get('title')
+        email = request.data.get('email')
+  
+        serializer = APIInputSerializerCheckup(data={"content": content, "title": title, "email": email})
+        if not serializer.is_valid():
+            date_time = datetime.datetime.now().strftime('%Y-%m-%d')
+            subject = f"{email} , result from Samanta content evaluator on {date_time}"
+            email_content = EMAIL_FROM_WEBSITE_FAILED.format(email, title, content, serializer.errors["content"][0])
+            send_content_email = send_email("Dowell UX Living Lab", "dowell@dowellresearch.uk", subject, email_content)
+            return Response({
+                "success": False,
+                "message": serializer.errors,
+            }, status=status.HTTP_200_OK)
+      
+        occurrences = json.loads(check_the_occurrences(email))
+        if not occurrences['success']:
+            return Response({
+                "success": False,
+                "message": occurrences["message"],
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        print(occurrences['occurrences'])
+        if occurrences["occurrences"] > 3:
+            return Response({
+                "success": False,
+                "message": f"Oops! This {email} has already experienced our service three times. Please contact us for further access"
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        data_count = json.loads(processApikey(userapikey))
+        if not data_count['success']:
+            return Response({
+                "success": False,
+                "message": data_count['message']
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        credits = data_count['total_credits']
+        if credits < 0:
+            return Response({
+                "success": False,
+                "message": data_count['message'],
+                "credits": credits
+            }, status=status.HTTP_200_OK)
+        
+        response = json.loads(originalAI(api_key, content, title))
+        if 'success' in response and response['success']:
+            originality_score = response['ai']['score']['original']
+            ai_score = response['ai']['score']['ai']
+            plagiarism_text_score = float(response['plagiarism']['total_text_score'].strip('%'))
+
+            originality_score_percent = originality_score * 100
+            ai_score_percent = ai_score * 100
+            creative = 100 - plagiarism_text_score
+
+            readability_stats = response['readability']['textStats']
+            letter_count = readability_stats['letterCount']
+            sentence_count = readability_stats['sentenceCount']
+            paragraph_count = readability_stats['paragraphCount']
+
+            if ai_score <= 0.10:
+                category = "Written by Human"
+            elif ai_score <= 0.30:
+                category = "Most Probably written by Human"
+            elif ai_score <= 0.70:
+                category = "Either written by Human/AI"
+            elif ai_score <= 0.90:
+                category = "Most Probably written by AI"
+            else:
+                category = "Written by AI"
+
+            response_data = {
+                "success": True,
+                "message": "The test was successful",
+                "Confidence level created by AI": f"{ai_score_percent:.2f}%",
+                "Confidence level created by Human": f"{originality_score_percent:.2f}%",
+                "AI Check": f"{category}",
+                "Plagiarised": f"{plagiarism_text_score:.2f}%",
+                "Creative": f"{creative:.2f}%",
+                "Total characters": letter_count,
+                "Total sentences": sentence_count,
+                "Total paragraphs": paragraph_count,
+                "credits": credits,
+                "title": title,
+                "content": content,
+                "Total experienced": occurrences["occurrences"]
+            }
+
+            def save_experienced_data():
+                save_experienced_product_data(
+                    "SAMANTA CONTENT EVALUATOR",
+                    email,
+                    {
+                       "Confidence level created by AI": f"{ai_score_percent:.2f}%",
+                        "Confidence level created by Human": f"{originality_score_percent:.2f}%",
+                        "AI Check": f"{category}",
+                        "Plagiarised": f"{plagiarism_text_score:.2f}%",
+                        "Creative": f"{creative:.2f}%",
+                        "Total characters": letter_count,
+                        "Total sentences": sentence_count,
+                        "Total paragraphs": paragraph_count,
+                        "title": title,
+                        "content": content,
+                        "Total experienced": occurrences["occurrences"] 
+                    }
+                )
+            print(save_experienced_data())
+            experienced_date = Thread(target=save_experienced_data)
+            experienced_date.start()
+
+            date_time = datetime.datetime.now().strftime('%Y-%m-%d')
+            subject = f"{email} , result from Samanta content evaluator on {date_time}"
+            email_content = EMAIL_FROM_WEBSITE.format(email, title, content, ai_score_percent, originality_score_percent, category, plagiarism_text_score, creative, letter_count, sentence_count, paragraph_count)
+            send_content_email = send_email("Dowell UX Living Lab", "dowell@dowellresearch.uk", subject, email_content)
+
+            return Response(response_data, status=status.HTTP_200_OK)
+        elif 'error' in response:
+            return Response({
+                "success": False,
+                "message": response['error']
+            })
+        else:
+            return Response({
+                "success": False,
+                "message": "The test was not successful",
             }, status=status.HTTP_200_OK)
