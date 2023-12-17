@@ -347,50 +347,28 @@ class originalityConentTest(APIView):
 class originalityContentTestSaveToDB(APIView):
     def post(self, request, userapikey):
         api_key = ORIGINAL_API_KEY
-        content = request.data.get('content')
-        title = request.data.get('title')
-        email = request.data.get('email')
-  
-        serializer = APIInputSerializerCheckup(data={"content": content, "title": title, "email": email})
+        data = request.data
+        content = data.get('content')
+        title = data.get('title')
+        email = data.get('email')
+        occurrences = int(data.get('occurrences'))
+
+        serializer = APIInputDataSerializerCheckup(data={"content": content, "title": title, "email": email, "occurrences": occurrences})
         if not serializer.is_valid():
-            date_time = datetime.datetime.now().strftime('%Y-%m-%d')
-            subject = f"{email} , result from Samanta content evaluator on {date_time}"
-            email_content = EMAIL_FROM_WEBSITE_FAILED.format(email, title, content, serializer.errors["content"][0])
-            send_content_email = send_email("Dowell UX Living Lab", "dowell@dowellresearch.uk", subject, email_content)
             return Response({
                 "success": False,
-                "message": serializer.errors,
-            }, status=status.HTTP_200_OK)
-      
-        occurrences = json.loads(check_the_occurrences(email))
-        if not occurrences['success']:
-            return Response({
-                "success": False,
-                "message": occurrences["message"],
+                "message": "Posting wrong data to API",
+                "error": serializer.errors,
             }, status=status.HTTP_400_BAD_REQUEST)
         
-        print(occurrences['occurrences'])
-        if occurrences["occurrences"] > 3:
+        experience_database_service_response = experience_database_services(email, "UXLIVINGLAB001", occurrences)
+        if not experience_database_service_response.get("success"):
             return Response({
                 "success": False,
-                "message": f"Oops! This {email} has already experienced our service three times. Please contact us for further access"
+                "message": experience_database_service_response.get("message", "Content could not be evaluated")
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        data_count = json.loads(processApikey(userapikey))
-        if not data_count['success']:
-            return Response({
-                "success": False,
-                "message": data_count['message']
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        credits = data_count['total_credits']
-        if credits < 0:
-            return Response({
-                "success": False,
-                "message": data_count['message'],
-                "credits": credits
-            }, status=status.HTTP_200_OK)
-        
+        occurrences += 1
         response = json.loads(originalAI(api_key, content, title))
         if 'success' in response and response['success']:
             originality_score = response['ai']['score']['original']
@@ -428,47 +406,54 @@ class originalityContentTestSaveToDB(APIView):
                 "Total characters": letter_count,
                 "Total sentences": sentence_count,
                 "Total paragraphs": paragraph_count,
-                "credits": credits,
                 "title": title,
                 "content": content,
-                "Total experienced": occurrences["occurrences"]
+                "Total experienced": occurrences
             }
 
-            def save_experienced_data():
-                save_experienced_product_data(
-                    "SAMANTA CONTENT EVALUATOR",
-                    email,
-                    {
-                       "Confidence level created by AI": f"{ai_score_percent:.2f}%",
-                        "Confidence level created by Human": f"{originality_score_percent:.2f}%",
-                        "AI Check": f"{category}",
-                        "Plagiarised": f"{plagiarism_text_score:.2f}%",
-                        "Creative": f"{creative:.2f}%",
-                        "Total characters": letter_count,
-                        "Total sentences": sentence_count,
-                        "Total paragraphs": paragraph_count,
-                        "title": title,
-                        "content": content,
-                        "Total experienced": occurrences["occurrences"] 
-                    }
-                )
-            print(save_experienced_data())
-            experienced_date = Thread(target=save_experienced_data)
+            experienced_date = Thread(target=self.save_experienced_data, args=(email, response_data))
+            experienced_date.daemon = True
             experienced_date.start()
 
-            date_time = datetime.datetime.now().strftime('%Y-%m-%d')
-            subject = f"{email} , result from Samanta content evaluator on {date_time}"
-            email_content = EMAIL_FROM_WEBSITE.format(email, title, content, ai_score_percent, originality_score_percent, category, plagiarism_text_score, creative, letter_count, sentence_count, paragraph_count)
-            send_content_email = send_email("Dowell UX Living Lab", "dowell@dowellresearch.uk", subject, email_content)
+            experienced_reduce = Thread(target=self.reduce_experienced_counts, args=(email, occurrences))
+            experienced_reduce.daemon = True
+            experienced_reduce.start()
 
-            return Response(response_data, status=status.HTTP_200_OK)
-        elif 'error' in response:
             return Response({
-                "success": False,
-                "message": response['error']
-            })
+                "success": True,
+                "message": "Content was successfully evaluated",
+                "response": response_data
+            }, status=status.HTTP_200_OK)
         else:
             return Response({
                 "success": False,
-                "message": "The test was not successful",
-            }, status=status.HTTP_200_OK)
+                "message": "Content could not be evaluated"
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+    def save_experienced_data(self, email, data):
+        try:
+            save_experienced_product_data(
+                "SAMANTA CONTENT EVALUATOR",
+                email,
+                {
+                    "Confidence level created by AI": data["Confidence level created by AI"],
+                    "Confidence level created by Human": data["Confidence level created by Human"],
+                    "AI Check": data["AI Check"],
+                    "Plagiarised": data["Plagiarised"],
+                    "Creative": data["Creative"],
+                    "Total characters": data["Total characters"], 
+                    "Total sentences": data["Total sentences"],
+                    "Total paragraphs": data["Total paragraphs"],
+                    "title": data["title"],
+                    "content": data["content"],
+                    "Total experienced": data["Total experienced"]
+                }
+            )
+        except Exception as e:
+            print(f"Error in save_experienced_data: {str(e)}")
+
+    def reduce_experienced_counts(self, email, occurrences):
+        try:
+            update_user_usage(email, occurrences)
+        except Exception as e:
+            print(f"Error in reduce_experienced_counts: {str(e)}")

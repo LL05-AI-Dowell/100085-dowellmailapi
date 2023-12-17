@@ -24,3 +24,13 @@ class APIInputSerializerCheckup(serializers.Serializer):
         min_words = 60
         WordCountValidator(min_words)(value)
         return value
+class APIInputDataSerializerCheckup(serializers.Serializer):
+    content = serializers.CharField(allow_null=False, allow_blank=False)
+    title = serializers.CharField(allow_null=False, allow_blank=False)
+    email = serializers.EmailField(allow_null=False, allow_blank=False)
+    occurrences = serializers.IntegerField()
+
+    def validate_content(self, value):
+        min_words = 60
+        WordCountValidator(min_words)(value)
+        return value
