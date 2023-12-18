@@ -351,7 +351,9 @@ class originalityContentTestSaveToDB(APIView):
         content = data.get('content')
         title = data.get('title')
         email = data.get('email')
-        occurrences = int(data.get('occurrences'))
+        occurrences = data.get('occurrences')
+
+        occurrences = int(occurrences)
 
         serializer = APIInputDataSerializerCheckup(data={"content": content, "title": title, "email": email, "occurrences": occurrences})
         if not serializer.is_valid():
@@ -361,7 +363,9 @@ class originalityContentTestSaveToDB(APIView):
                 "error": serializer.errors,
             }, status=status.HTTP_400_BAD_REQUEST)
         
-        experience_database_service_response = experience_database_services(email, "UXLIVINGLAB001", occurrences)
+        print(occurrences)
+        
+        experience_database_service_response = json.loads(experience_database_services(email, occurrences))
         if not experience_database_service_response.get("success"):
             return Response({
                 "success": False,
@@ -370,7 +374,9 @@ class originalityContentTestSaveToDB(APIView):
 
         occurrences += 1
         response = json.loads(originalAI(api_key, content, title))
+        print("-------------------------------",response)
         if 'success' in response and response['success']:
+            print("-------------------------------")
             originality_score = response['ai']['score']['original']
             ai_score = response['ai']['score']['ai']
             plagiarism_text_score = float(response['plagiarism']['total_text_score'].strip('%'))
@@ -394,7 +400,7 @@ class originalityContentTestSaveToDB(APIView):
                 category = "Most Probably written by AI"
             else:
                 category = "Written by AI"
-
+            print("-------------------------------")
             response_data = {
                 "success": True,
                 "message": "The test was successful",
@@ -418,7 +424,7 @@ class originalityContentTestSaveToDB(APIView):
             experienced_reduce = Thread(target=self.reduce_experienced_counts, args=(email, occurrences))
             experienced_reduce.daemon = True
             experienced_reduce.start()
-
+            print("-------------------------------",)
             return Response({
                 "success": True,
                 "message": "Content was successfully evaluated",
