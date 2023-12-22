@@ -374,7 +374,7 @@ class originalityContentTestSaveToDB(APIView):
 
         occurrences += 1
         response = json.loads(originalAI(api_key, content, title))
-        print("-------------------------------",response)
+
         if 'success' in response and response['success']:
             print("-------------------------------")
             originality_score = response['ai']['score']['original']
@@ -413,17 +413,39 @@ class originalityContentTestSaveToDB(APIView):
                 "Total sentences": sentence_count,
                 "Total paragraphs": paragraph_count,
                 "title": title,
-                "content": content,
-                "Total experienced": occurrences
+                "content": content
             }
 
-            experienced_date = Thread(target=self.save_experienced_data, args=(email, response_data))
+            def save_experienced_data():
+                save_experienced_product_data(
+                    "SAMANTA CONTENT EVALUATOR",
+                    email,
+                    {
+                        "Confidence level created by AI": f"{ai_score_percent:.2f}%",
+                        "Confidence level created by Human": f"{originality_score_percent:.2f}%",
+                        "AI Check": f"{category}",
+                        "Plagiarised": f"{plagiarism_text_score:.2f}%",
+                        "Creative": f"{creative:.2f}%",
+                        "Total characters": letter_count,
+                        "Total sentences": sentence_count,
+                        "Total paragraphs": paragraph_count,
+                        "title": title,
+                        "content": content
+                    }
+                )
+
+            def reduce_experienced_counts():
+                update_user_usage(email, occurrences)
+
+
+            experienced_date = Thread(target=save_experienced_data)
             experienced_date.daemon = True
             experienced_date.start()
 
-            experienced_reduce = Thread(target=self.reduce_experienced_counts, args=(email, occurrences))
+            experienced_reduce = Thread(target=reduce_experienced_counts)
             experienced_reduce.daemon = True
             experienced_reduce.start()
+
             print("-------------------------------",)
             return Response({
                 "success": True,
@@ -436,30 +458,6 @@ class originalityContentTestSaveToDB(APIView):
                 "message": "Content could not be evaluated"
             }, status=status.HTTP_400_BAD_REQUEST)
 
-    def save_experienced_data(self, email, data):
-        try:
-            save_experienced_product_data(
-                "SAMANTA CONTENT EVALUATOR",
-                email,
-                {
-                    "Confidence level created by AI": data["Confidence level created by AI"],
-                    "Confidence level created by Human": data["Confidence level created by Human"],
-                    "AI Check": data["AI Check"],
-                    "Plagiarised": data["Plagiarised"],
-                    "Creative": data["Creative"],
-                    "Total characters": data["Total characters"], 
-                    "Total sentences": data["Total sentences"],
-                    "Total paragraphs": data["Total paragraphs"],
-                    "title": data["title"],
-                    "content": data["content"],
-                    "Total experienced": data["Total experienced"]
-                }
-            )
-        except Exception as e:
-            print(f"Error in save_experienced_data: {str(e)}")
+    
 
-    def reduce_experienced_counts(self, email, occurrences):
-        try:
-            update_user_usage(email, occurrences)
-        except Exception as e:
-            print(f"Error in reduce_experienced_counts: {str(e)}")
+    
