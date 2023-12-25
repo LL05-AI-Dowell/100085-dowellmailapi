@@ -437,7 +437,7 @@ class originalityContentTestSaveToDB(APIView):
             def reduce_experienced_counts():
                 update_user_usage(email, occurrences)
 
-
+            print("-------------------------------",)
             experienced_date = Thread(target=save_experienced_data)
             experienced_date.daemon = True
             experienced_date.start()
