@@ -354,6 +354,7 @@ class originalityContentTestSaveToDB(APIView):
         occurrences = data.get('occurrences')
 
         occurrences = int(occurrences)
+        print("-------------------------------1")
 
         serializer = APIInputDataSerializerCheckup(data={"content": content, "title": title, "email": email, "occurrences": occurrences})
         if not serializer.is_valid():
@@ -364,7 +365,7 @@ class originalityContentTestSaveToDB(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
         
         print(occurrences)
-        
+        print("-------------------------------2")
         experience_database_service_response = json.loads(experience_database_services(email, occurrences))
         if not experience_database_service_response.get("success"):
             return Response({
@@ -374,7 +375,7 @@ class originalityContentTestSaveToDB(APIView):
 
         occurrences += 1
         response = json.loads(originalAI(api_key, content, title))
-
+        print("-------------------------------3")
         if 'success' in response and response['success']:
             print("-------------------------------")
             originality_score = response['ai']['score']['original']
@@ -400,7 +401,7 @@ class originalityContentTestSaveToDB(APIView):
                 category = "Most Probably written by AI"
             else:
                 category = "Written by AI"
-            print("-------------------------------")
+            print("-------------------------------4")
             response_data = {
                 "success": True,
                 "message": "The test was successful",
@@ -415,7 +416,7 @@ class originalityContentTestSaveToDB(APIView):
                 "title": title,
                 "content": content
             }
-
+            print("-------------------------------5")
             def save_experienced_data():
                 save_experienced_product_data(
                     "SAMANTA CONTENT EVALUATOR",
@@ -433,11 +434,11 @@ class originalityContentTestSaveToDB(APIView):
                         "content": content
                     }
                 )
-
+            print("-------------------------------6")
             def reduce_experienced_counts():
                 update_user_usage(email, occurrences)
 
-            print("-------------------------------",)
+            print("-------------------------------7",)
             experienced_date = Thread(target=save_experienced_data)
             experienced_date.daemon = True
             experienced_date.start()
@@ -446,7 +447,7 @@ class originalityContentTestSaveToDB(APIView):
             experienced_reduce.daemon = True
             experienced_reduce.start()
 
-            print("-------------------------------",)
+            print("-------------------------------8",)
             return Response({
                 "success": True,
                 "message": "Content was successfully evaluated",
