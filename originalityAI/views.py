@@ -448,6 +448,10 @@ class originalityContentTestSaveToDB(APIView):
             experienced_reduce.start()
 
             print("-------------------------------8",)
+            date_time = datetime.datetime.now().strftime('%Y-%m-%d')
+            subject = f"{email} , result from Samanta content evaluator on {date_time}"
+            email_content = EMAIL_FROM_WEBSITE.format(email, title, content, ai_score_percent, originality_score_percent, category, plagiarism_text_score, creative, letter_count, sentence_count, paragraph_count)
+            send_content_email = send_email("Dowell UX Living Lab", "dowell@dowellresearch.uk", subject, email_content)
             return Response({
                 "success": True,
                 "message": "Content was successfully evaluated",
