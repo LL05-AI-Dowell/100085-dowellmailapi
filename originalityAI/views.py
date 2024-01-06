@@ -355,7 +355,7 @@ class originalityContentTestSaveToDB(APIView):
 
         occurrences = int(occurrences)
         print("-------------------------------1")
-
+        print("-------------api key used------------------",userapikey)
         serializer = APIInputDataSerializerCheckup(data={"content": content, "title": title, "email": email, "occurrences": occurrences})
         if not serializer.is_valid():
             return Response({

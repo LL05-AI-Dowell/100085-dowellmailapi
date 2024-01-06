@@ -6,6 +6,6 @@ urlpatterns = [
     # current api
     path('website-api/<str:userapikey>/', originalityContentTestSaveToDB.as_view()), 
     
-    path('website-api/v2/<str:userapikey>/', originalityConentTest.as_view()), 
+    path('website-api/v3/<str:userapikey>/', originalityConentTest.as_view()), 
     path('', originalAITestInternal.as_view()),
 ]
