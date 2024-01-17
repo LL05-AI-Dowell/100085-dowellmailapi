@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'app',
     'originalityAI',
     'dowellnewsletter',
-    'flikiAi'
+    'flikiAi',
+    'bett_event'
 ]
 
 MIDDLEWARE = [
