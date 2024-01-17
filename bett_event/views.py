@@ -19,7 +19,7 @@ collection_db="Testing_colour"
 
 @method_decorator(csrf_exempt, name='dispatch')
 class bett_event_services(APIView):
-    def get(self, request):
+    def get(self,request,document_id):
         response = json.loads(datacube_data_retrival(
             api_key,
             database_db,
@@ -35,7 +35,7 @@ class bett_event_services(APIView):
             "response": response["data"]
         })
     
-    def post(self, request):
+    def post(self, request,document_id):
         response= json.loads(datacube_data_insertion(
             api_key,
             database_db,
@@ -45,7 +45,7 @@ class bett_event_services(APIView):
             }
         ))
         return Response(response)
-    def put(self, request):
+    def put(self, request,document_id):
         colm_number = request.data.get('colm_number')
         row_number = request.data.get('row_number')
         stand_number = request.data.get('stand_number')
@@ -101,15 +101,10 @@ class bett_event_services(APIView):
             database_db,
             collection_db,
             {
-                "_id": "65a78a37c5b56cc2cab6c240"
+                "_id": document_id
             },
             col_data
         ))
-        if not response("success"):
-            return Response({
-                "success": False,
-                "message": "Failed to update"
-            },status=status.HTTP_400_BAD_REQUEST)
 
         return Response({
             "success": True,
@@ -117,14 +112,21 @@ class bett_event_services(APIView):
         })
 
 
-    def delete(self, request):
-        response = json.loads(datacube_delete_data(
-            api_key,
-            database_db,
-            collection_db,
-            {
-                "_id":"65a78a37c5b56cc2cab6c240"
-            }
-        ))
-        return Response(response)
+    def delete(self, request, document_id):
+        try:
+            print("-------------------------------------------------------------", document_id)
+            response = json.loads(datacube_delete_data(
+                api_key,
+                database_db,
+                collection_db,
+                {
+                    "_id": document_id
+                }
+            ))
+            return Response(response)
+        except Exception as e:
+            # Log the exception
+            print(f"An error occurred: {str(e)}")
+            # Return an appropriate response or re-raise the exception
+            return Response({"error": "An error occurred"}, status=500)
     
