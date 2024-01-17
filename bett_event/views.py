@@ -24,7 +24,9 @@ class bett_event_services(APIView):
             api_key,
             database_db,
             collection_db,
-            {},
+            {
+                "_id": document_id
+            },
             1,
             0,
             False
