@@ -45,18 +45,21 @@ class bett_event_services(APIView):
             }
         ))
         return Response(response)
-    def put(self, request,document_id):
+    def put(self, request, document_id):
         colm_number = request.data.get('colm_number')
         row_number = request.data.get('row_number')
         stand_number = request.data.get('stand_number')
         color_code = request.data.get('color_code')
         box_id = request.data.get('box_id')
-        if not row_number or not colm_number or not stand_number or not color_code or not box_id :
+        type_of_place = request.data.get('type_of_place')
+
+        if not row_number or not colm_number or not type_of_place or not color_code or not box_id:
             return Response({
                 "success": False,
-                "message": "Parameter are missing"
+                "message": "Parameters are missing"
             })
-        
+
+        # Retrieve existing data from the database
         response_data = json.loads(datacube_data_retrival(
             api_key,
             database_db,
@@ -68,47 +71,55 @@ class bett_event_services(APIView):
         ))
 
         data = response_data.get("data", [])[0]
-        
+
         col_data = {}
 
         if colm_number in data:
-            col_data[colm_number] = data[colm_number]  
+            col_data[colm_number] = data[colm_number]
 
             found_entry = False
+
             for entry in col_data[colm_number]:
                 if entry["row_number"] == row_number:
+                    # Update the necessary fields
                     entry["color_code"] = color_code
+                    entry["stand_number"] = stand_number 
+                    entry["box_id"] = box_id
+                    entry["type_of_place"] = type_of_place
                     found_entry = True
                     break
 
             if not found_entry:
+                # If no matching entry is found, append a new entry
                 col_data[colm_number].append({
                     "row_number": row_number,
                     "color_code": color_code,
                     "stand_number": stand_number,
-                    "box_id": box_id
+                    "box_id": box_id,
+                    "type_of_place": type_of_place
                 })
         else:
+            # If colm_number is not in data, create a new entry
             col_data[colm_number] = [{
                 "row_number": row_number,
                 "color_code": color_code,
                 "stand_number": stand_number,
-                "box_id": box_id
+                "box_id": box_id,
+                "type_of_place": type_of_place
             }]
 
+        # Update the database with the modified col_data
         response = json.loads(datacube_data_update(
             api_key,
             database_db,
             collection_db,
-            {
-                "_id": document_id
-            },
+            {"_id": document_id},
             col_data
         ))
 
         return Response({
             "success": True,
-            "message": "Updated to database"
+            "message": "Updated to the database"
         })
 
 
