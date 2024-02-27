@@ -25,4 +25,5 @@ urlpatterns = [
     path('uxlivinglab/email/',common_email_api.as_view()),
     path('uxlivinglab/verify-email/',verify_email.as_view()),
     path('candidate_removal/',candidate_removal.as_view()),
+    path('dowell_bulk_email/',common_bulk_email.as_view()),
 ]

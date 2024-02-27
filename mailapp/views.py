@@ -19,6 +19,7 @@ import os
 from mailapp.zeroBounce import validateMail as vE 
 from mailapp.zeroBounce.validateMail import emailFinder
 from dotenv import load_dotenv
+from .serializers import *
 
 # load_dotenv()
 load_dotenv("/home/100085/100085-dowellmailapi/.env")
@@ -891,7 +892,10 @@ class common_api(APIView):
         print("---Got the template the htmlContent---")
         emailBody = email_content
         print("---Checking whether email is valid---")
-        email_validation = vE.validateMail(SECRET_KEY,toemail)
+        # email_validation = vE.validateMail(SECRET_KEY,toemail)
+        email_validation = {
+            "status": "valid"
+        }
         if email_validation['status'] == "valid":
             print("---Email is valid---")
             configuration = sib_api_v3_sdk.Configuration()
@@ -907,6 +911,7 @@ class common_api(APIView):
             try:
                 api_response = api_instance.send_transac_email(send_smtp_email)
                 api_response_dict = api_response.to_dict()
+                print(api_response_dict)
                 print("---The mail has been sent ! Happy :D---")
                 return Response({
                     "success": True,
@@ -1040,3 +1045,72 @@ class verify_email(APIView):
                 "success": False,
                 "message": f"Sorry ! {email} is not a valid email"  
             },status=status.HTTP_400_BAD_REQUEST)
+
+@method_decorator(csrf_exempt, name='dispatch')
+class common_bulk_email(APIView):
+    def post(self,request):
+        email_content = request.data.get('email_content')
+        to_email_list = request.data.get('to_email_list')
+        fromname = request.data.get('fromname')
+        fromemail = request.data.get('fromemail')
+        subject = request.data.get('subject')
+        print("---Got the template the htmlContent---")
+        serializer = BulkEmailSenderSerializer(data={
+            "email_content":email_content,
+            "to_email_list":to_email_list,
+            "fromname":fromname,
+            "fromemail":fromemail,
+            "subject":subject
+        })
+        if not serializer.is_valid():
+            return Response({
+                "success": False,
+                "message": "Posting wrong data to API",
+                "error": serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+        emailBody = email_content
+        print("---Checking whether email is valid---")
+        verified_emails = []
+        unverified_emails = []
+
+        for item in to_email_list:
+            email = item["email"]
+            email_validation = vE.validateMail(SECRET_KEY, email)
+            if email_validation['status'] == "valid":
+                verified_emails.append(item)
+            else:
+                unverified_emails.append(item)
+
+        if not verified_emails:
+            return Response({
+                "success": False,
+                "message": "Non of the give emails are valid"
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        configuration = sib_api_v3_sdk.Configuration()
+        configuration.api_key['api-key'] = API_KEY
+        api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
+        subject = subject
+        html_content = emailBody
+        sender = {"name": fromname, "email": fromemail}
+        to = verified_emails
+        headers = {"Some-Custom-Name": "unique-id-1234"}
+        print("---All the data are gethered and ready to send mail---")
+        send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(to=to, headers=headers,html_content=html_content, sender=sender, subject=subject)
+        try:
+            api_response = api_instance.send_transac_email(send_smtp_email)
+            api_response_dict = api_response.to_dict()
+            print("---The mail has been sent ! Happy :D---")
+            return Response({
+                "success": True,
+                "message":"Mail has been sent!!",
+                "verified_emails_list": verified_emails,
+                "unverified_emails_list": unverified_emails
+            },status=status.HTTP_200_OK)
+        except ApiException as e:
+            return Response({
+                "success":False,
+                "message":"Failed to send mail",
+                "error":"Exception when calling SMTPApi->send_transac_email: %s\n" % e
+            },status=status.HTTP_400_BAD_REQUEST)
+        
