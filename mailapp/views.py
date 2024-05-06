@@ -1040,6 +1040,11 @@ class verify_email(APIView):
                 "success": True,
                 "message": f"Hurray ! {email} is a valid email"  
             },status=status.HTTP_200_OK)
+        elif email_validation['status'] == "Something went wrong":
+            return Response({
+                "success": False,
+                "message": "Please contact admin"  
+            },status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({
                 "success": False,
