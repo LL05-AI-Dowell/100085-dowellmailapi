@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+        <style>
+            @import url(https://fonts.googleapis.com/css?family=Open+Sans);
+
+            @media (max-width: 600px) {
+                .logo {
+                    margin-top: 150px;
+                    margin-bottom: 0px;
+                }
+                .font-title {
+                    font-size: small;
+                }
+                .font-title2 {
+                    font-size:x-small;
+                }
+
+            }
+            @media (max-width: 768px) {
+                .logo {
+                    margin-top: 150px;
+                    margin-bottom: 0px;
+                }
+            }
+            @media (min-width: 768px) {
+                .logo {
+                    margin-top: 150px;
+                    margin-bottom: 0px;
+                }
+            }
+
+        </style>
+    </head>
+
+    <body style="padding: 0;margin: 0;display: flex;justify-content: center;align-items: center;height: 100vh;width: 100vw;font-family: 'Open Sans',serif;">
+        <div style="display: flex;flex-direction: column;align-items: center;height: 40em;width: 30em;padding: 1em;gap:1em;">
+            <section style="height: 15%;width: 100%;display: flex;align-items: center;justify-content: center;">
+                <img src="./Logo 500_500.png" alt="log" style="width: 20%;" class="logo">
+            </section>
+            <section
+                style="height: 65%;width: 100%;display: flex;flex-direction: column;align-items: center;line-height: 0.1;">
+                <img src="./icons8-verified-account-50.png" alt="tick" style="width: 10%; padding: 10%">
+                <p style="font-weight: bold;" class="font-title">Your account has been created successfully</p>
+                <p style="font-weight: bold;">Hi {}</p>
+                <p style="font-weight: bold;" class="font-title2">Welcome to UX Living Lab, Your new account details are,</p>
+                <div style="line-height: 1.2;">
+                    <ul style="list-style: none;font-weight: bold;">
+                        <li>First Name : {}</li>
+                        <li>Last Name : {}</li>
+                        <li>Username : {}</li>
+                        <li>Phone : {}</li>
+                        <li>Email : {}</li>
+                        <li>User Type : {}</li>
+                        <li>Country : {}</li>
+                    </ul>
+                </div>
+                <a style="text-decoration: none;" href="https://100014.pythonanywhere.com/"><button style="display: flex;align-items: center;background-color: #CCA250;padding: 0.5em;margin: 20px;border-radius: 1em;">CLICK HERE TO LOGIN</button></a>
+            </section>
+            <section style="height: 20%;width: 100%;display: flex;flex-direction: column;align-items: center;justify-content: center;background-color: black;color: aliceblue; margin-top: 50px;">
+                <h1>Dowell UX Living Lab</h1>
+                <div class="social-media-icon">
+                    <img src="./icons8-twitter-circled-64.png" alt="twitter" style="width: 2em;filter: invert(100%)">
+                    <img src="./icons8-linkedin-circled-50.png" alt="linkdin" style="width: 2em;filter: invert(100%)">
+                </div>
+            </section>
+        </div>
+    </body>
+
+</html>
