@@ -39,7 +39,8 @@ def validateMail(api_key, email):
                     {
                         "email": email,
                         "status": response_data["status"],
-                        "checked_on": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                        "checked_on": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                        "records": [{"record": "1", "type": "overall"}]
                     }
                 ))
 
@@ -55,7 +56,8 @@ def validateMail(api_key, email):
                     {
                         "email": email,
                         "status": response_data["status"],
-                        "checked_on": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                        "checked_on": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                        "records": [{"record": "1", "type": "overall"}]
                     }
                 ))
 
