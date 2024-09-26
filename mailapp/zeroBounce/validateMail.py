@@ -89,6 +89,7 @@ def validateMail(api_key, email):
         print("The email is already present in the database and it is invalid email address")
         return {"status":"Invalid or risky email"}
     
+    
 
 
 def emailFinder(api_key, domain, name):
