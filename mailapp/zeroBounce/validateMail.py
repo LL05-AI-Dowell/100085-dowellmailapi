@@ -61,9 +61,26 @@ def validateMail(api_key, email):
                     }
                 ))
 
+                print("data to be inserted",insert_email_to_db)
+
                 if not insert_email_to_db["success"]:
                     return {"status": "Something went wrong"}
                 return {"status": "Invalid or risky email"}
+        else:
+            insert_email_to_db = json.loads(datacube_data_insertion(
+                    "1b834e07-c68b-4bf6-96dd-ab7cdc62f07",
+                    "emaildatabase",
+                    "emaildata",
+                    {
+                        "email": email,
+                        "status": "potentially_valid",
+                        "checked_on": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                        "records": [{"record": "1", "type": "overall"}]
+                    }
+                ))
+            if not insert_email_to_db["success"]:
+                return {"status": "Something went wrong"}
+            return {"status": "valid"}
     
     if existingEmail["data"][0]["status"] == "valid":
         print("The email is already present in the database and it is valid email address")
