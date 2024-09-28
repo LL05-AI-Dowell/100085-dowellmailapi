@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path , include
 from serverstatus import *
-from views import *
+from .views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,5 +27,5 @@ urlpatterns = [
     path('uxlivinglab/newsletter/v1/',(include('dowellnewsletter.urls'))),
     path('api/v1/dowell-video-generator/', include('flikiAi.urls')),
     path('api/v1/bett_event/', include('bett_event.urls')),
-    path('api/datacube/', retrive_data.as_view())
+    path('api/datacube/', datacube_report_view.as_view())
 ]
