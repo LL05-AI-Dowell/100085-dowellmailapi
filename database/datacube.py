@@ -3,7 +3,7 @@ import requests
 
 base_url = "https://www.dowelldatacube.uxlivinglab.online/db_api"
 # base_url = "https://datacube.uxlivinglab.online/db_api/"
-
+api_key = "1b834e07-c68b-4bf6-96dd-ab7cdc62f07f"
 def datacube_data_insertion(api_key, database_name, collection_name, data):
     global base_url
     url = f"{base_url}/crud/"
