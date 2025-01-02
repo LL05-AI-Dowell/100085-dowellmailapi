@@ -9,8 +9,8 @@ import os
 from .helper import *
 import json
 
-load_dotenv()
-# load_dotenv("/home/100085/100085-dowellmailapi/.env")
+# load_dotenv()
+load_dotenv("/home/100085/100085-dowellmailapi/.env")
 FLIGHT_SERVICE_APP_ID = str(os.getenv('FLIGHT_SERVICE_APP_ID')) 
 FLIGHT_SERVICE_APP_KEY = str(os.getenv('FLIGHT_SERVICE_APP_KEY')) 
 
