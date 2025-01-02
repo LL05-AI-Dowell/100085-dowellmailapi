@@ -9,8 +9,8 @@ import os
 from .helper import *
 import json
 
-# load_dotenv()
-load_dotenv("/home/100085/100085-dowellmailapi/.env")
+load_dotenv()
+# load_dotenv("/home/100085/100085-dowellmailapi/.env")
 FLIGHT_SERVICE_APP_ID = str(os.getenv('FLIGHT_SERVICE_APP_ID')) 
 FLIGHT_SERVICE_APP_KEY = str(os.getenv('FLIGHT_SERVICE_APP_KEY')) 
 
@@ -78,14 +78,15 @@ class flight_data(APIView):
     def get_airport_by_lat_long(self, request):
         latitude = request.data.get('latitude')
         longitude = request.data.get('longitude')
+        radiusMiles = request.data.get('radiusMiles')
 
-        if not all([latitude, longitude]):
+        if not all([latitude, longitude,radiusMiles]):
             return Response({
                 "success": False,
                 "message": "Please provide both latitude and longitude"
             }, status=status.HTTP_400_BAD_REQUEST)
         
-        res = get_airports_data_by_lat_long(latitude, longitude, 20, FLIGHT_SERVICE_APP_ID, FLIGHT_SERVICE_APP_KEY)
+        res = get_airports_data_by_lat_long(latitude, longitude, radiusMiles, FLIGHT_SERVICE_APP_ID, FLIGHT_SERVICE_APP_KEY)
 
         if not res['success']:
             return Response({
@@ -98,6 +99,7 @@ class flight_data(APIView):
             "message": "All Airports list retrieved successfully",
             "response": res['response']['airports']
         })
+    
     def get_flights_arrival_departure(self, request):
         airport_code = request.data.get('airport_code')
         year = request.data.get('year')
