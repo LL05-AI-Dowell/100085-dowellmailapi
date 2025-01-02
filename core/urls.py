@@ -27,5 +27,6 @@ urlpatterns = [
     path('uxlivinglab/newsletter/v1/',(include('dowellnewsletter.urls'))),
     path('api/v1/dowell-video-generator/', include('flikiAi.urls')),
     path('api/v1/bett_event/', include('bett_event.urls')),
-    path('api/datacube/', datacube_report_view.as_view())
+    path('api/datacube/', datacube_report_view.as_view()),
+    path('api/fligts/', include('fligts.urls')),
 ]
