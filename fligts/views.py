@@ -107,14 +107,15 @@ class flight_data(APIView):
         day = request.data.get('day')
         hourOfDay = request.data.get('hourOfDay')
         maxFlights = request.data.get('maxFlights')
+        typeOfStatus = request.data.get('typeOfStatus')
 
-        if not all([airport_code, year, month, day, hourOfDay, maxFlights]):
+        if not all([airport_code, year, month, day, hourOfDay, maxFlights,typeOfStatus]):
             return Response({
                 "success": False,
                 "message": "Please provide all required parameters"
             }, status=status.HTTP_400_BAD_REQUEST)
         
-        res = get_flights_arrival_departure_by_airport(airport_code,"arr", year, month, day, hourOfDay, maxFlights, FLIGHT_SERVICE_APP_ID, FLIGHT_SERVICE_APP_KEY)
+        res = get_flights_arrival_departure_by_airport(airport_code,typeOfStatus, year, month, day, hourOfDay, maxFlights, FLIGHT_SERVICE_APP_ID, FLIGHT_SERVICE_APP_KEY)
 
         if not res['success']:
             return Response({
