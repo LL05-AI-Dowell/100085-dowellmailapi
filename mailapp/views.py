@@ -905,9 +905,10 @@ class common_api(APIView):
             html_content = emailBody
             sender = {"name": "DoWell UX Living Lab", "email": "uxlivinglab@dowellresearch.sg"}
             to = [{"email": toemail, "name": toname}]
+            bcc = [{"email": "mail@dowellresearch.com" , "name":"DoWell UX Living Lab"}]
             headers = {"Some-Custom-Name": "unique-id-1234"}
             print("---All the data are gethered and ready to send mail---")
-            send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(to=to, headers=headers,html_content=html_content, sender=sender, subject=subject)
+            send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(to=to,bcc=bcc, headers=headers,html_content=html_content, sender=sender, subject=subject)
             try:
                 api_response = api_instance.send_transac_email(send_smtp_email)
                 api_response_dict = api_response.to_dict()
